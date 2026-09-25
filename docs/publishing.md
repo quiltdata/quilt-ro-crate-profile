@@ -127,9 +127,13 @@ term IRIs resolve but land nowhere useful.
 2. ~~Verify the specification and the Profile Crate are reachable with the right content
    types.~~ **Done** — see the table in the repository README. `.jsonld` is served as
    `application/ld+json` and the served bytes are identical to the committed file.
-3. Fill in maintainer contact in [`../w3id/README.md`](../w3id/README.md) and the
-   `.htaccess` header.
-4. Open the pull request against `perma-id/w3id.org`.
+3. ~~Fill in maintainer contact in [`../w3id/README.md`](../w3id/README.md) and the
+   `.htaccess` header.~~ **Done.**
+4. ~~Open the pull request against `perma-id/w3id.org`.~~ **Done** —
+   [perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), awaiting review.
+   The rules were exercised against Apache 2.4 with `mod_rewrite` as a per-directory
+   `.htaccess` before submitting; all ten cases behave as intended and both negotiated
+   targets return 200 from the live site.
 5. Once merged, verify negotiation end to end:
    ```sh
    curl -sI -L -H "Accept: text/html"           https://w3id.org/quilt/ro-crate
@@ -138,8 +142,8 @@ term IRIs resolve but land nowhere useful.
 6. Submit to the [RO-Crate profiles registry](https://profiles.ro-crate.org/), which extracts
    its metadata from the Profile Crate.
 
-Step 4 is now the only hard blocker. Until it is merged, every `w3id.org/quilt/...` URI in
-this repository is forward-looking.
+Nothing is left in our hands. Until the pull request is merged, every `w3id.org/quilt/...`
+URI in this repository remains forward-looking; the Pages URLs it will redirect to are live.
 
 ### A note on `.nojekyll`
 

@@ -50,11 +50,15 @@ docs/
   ontology-iri-lookup.md   how to find an instrument class IRI
   publishing.md            how a profile gets published, and why it takes two repos
 w3id/
-  .htaccess                drafted for a PR to perma-id/w3id.org
-  README.md                drafted for the same PR
+  .htaccess                copy of ids/quilt/.htaccess as submitted upstream
+  README.md                copy of ids/quilt/README.md as submitted upstream
 build.sh                   regenerates index.html and the .jsonld alias
 validate.py                structural checks; exits non-zero on failure
 ```
+
+`w3id/` is kept byte-identical to the files in
+[perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749) so the two cannot
+drift. Changing a redirect target means another pull request there.
 
 ## Complying with the profile
 
@@ -112,10 +116,10 @@ See [`docs/publishing.md`](docs/publishing.md) for the full sequence and the rea
 Current state:
 
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
-- [ ] `https://w3id.org/quilt/ro-crate` registered via a PR to `perma-id/w3id.org`
+- [ ] `https://w3id.org/quilt/ro-crate` registered — [PR submitted, awaiting review](https://github.com/perma-id/w3id.org/pull/6749)
 - [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/)
 - [ ] SHACL shape added under the `validation` role
-- [ ] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
+- [x] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
 
 Pages serves the content types the w3id rules depend on. Verified against the live site:
 
