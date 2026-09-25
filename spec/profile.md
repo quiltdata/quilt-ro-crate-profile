@@ -7,7 +7,7 @@ ingested into [Quilt](https://docs.quiltdata.com/) packages.
 
 | | |
 |---|---|
-| Profile URI | `https://w3id.org/quilt/ro-crate` *(registration pending)* |
+| Profile URI | <https://w3id.org/quilt/ro-crate> |
 | This version | `https://w3id.org/quilt/ro-crate/0.1` |
 | Term namespace | `https://w3id.org/quilt/ro-crate#` |
 | `isProfileOf` | [RO-Crate 1.2](https://w3id.org/ro/crate/1.2) minimum; [1.3](https://w3id.org/ro/crate/1.3) permitted |

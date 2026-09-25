@@ -129,21 +129,28 @@ term IRIs resolve but land nowhere useful.
    `application/ld+json` and the served bytes are identical to the committed file.
 3. ~~Fill in maintainer contact in [`../w3id/README.md`](../w3id/README.md) and the
    `.htaccess` header.~~ **Done.**
-4. ~~Open the pull request against `perma-id/w3id.org`.~~ **Done** —
-   [perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), awaiting review.
-   The rules were exercised against Apache 2.4 with `mod_rewrite` as a per-directory
-   `.htaccess` before submitting; all ten cases behave as intended and both negotiated
-   targets return 200 from the live site.
-5. Once merged, verify negotiation end to end:
-   ```sh
-   curl -sI -L -H "Accept: text/html"           https://w3id.org/quilt/ro-crate
-   curl -sI -L -H "Accept: application/ld+json" https://w3id.org/quilt/ro-crate
+4. ~~Open the pull request against `perma-id/w3id.org`.~~ **Done and merged** —
+   [perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749). The rules were
+   exercised against Apache 2.4 with `mod_rewrite` as a per-directory `.htaccess` before
+   submitting, which is worth the effort: a mistake here costs another round trip through
+   someone else's review queue.
+5. ~~Verify negotiation end to end.~~ **Done:**
    ```
+   https://w3id.org/quilt/ro-crate
+     Accept: text/html           -> 200 text/html          (specification)
+     Accept: application/ld+json -> 200 application/ld+json (Profile Crate)
+     Accept: */*                 -> 200 text/html
+   https://w3id.org/quilt/ro-crate/0.1        -> same, version-pinned
+   https://w3id.org/quilt/ro-crate/0.1/...    -> passes through to Pages
+   https://w3id.org/quilt/                    -> the source repository
+   ```
+   Retrieving the Profile Crate through the permanent URI returns the expected `@id`,
+   version, `isProfileOf`, all three terms and all four resource roles. Term IRIs resolve to
+   the specification page with matching anchors.
 6. Submit to the [RO-Crate profiles registry](https://profiles.ro-crate.org/), which extracts
-   its metadata from the Profile Crate.
+   its metadata from the Profile Crate. **Outstanding** — the only remaining step.
 
-Nothing is left in our hands. Until the pull request is merged, every `w3id.org/quilt/...`
-URI in this repository remains forward-looking; the Pages URLs it will redirect to are live.
+Elapsed time for step 4: the pull request was opened and merged the same day.
 
 ### A note on `.nojekyll`
 

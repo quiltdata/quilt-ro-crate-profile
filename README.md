@@ -3,8 +3,8 @@
 An [RO-Crate](https://www.researchobject.org/ro-crate/) profile for crates that are
 ingested into [Quilt](https://docs.quiltdata.com/) packages.
 
-**Status: draft, version 0.1.0.** The profile URI is not yet registered — see
-[Publishing](#publishing) below.
+**Status: draft, version 0.1.0.** Published and resolvable at
+<https://w3id.org/quilt/ro-crate>.
 
 Instruments and acquisition software increasingly write an `ro-crate-metadata.json`
 alongside their output. That graph already records which files were produced, by whom, on
@@ -116,7 +116,7 @@ See [`docs/publishing.md`](docs/publishing.md) for the full sequence and the rea
 Current state:
 
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
-- [ ] `https://w3id.org/quilt/ro-crate` registered — [PR submitted, awaiting review](https://github.com/perma-id/w3id.org/pull/6749)
+- [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
 - [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/)
 - [ ] SHACL shape added under the `validation` role
 - [x] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
@@ -132,8 +132,16 @@ Pages serves the content types the w3id rules depend on. Verified against the li
 This is why the `.jsonld` alias exists, and why the w3id rules negotiate to it rather than to
 the `.json` the RO-Crate specification requires as a filename.
 
-Until the w3id registration is merged, every `https://w3id.org/quilt/...` URI in this
-repository is forward-looking and does not resolve. The Pages URLs above work now.
+The permanent URI resolves with content negotiation. Verified live:
+
+```
+https://w3id.org/quilt/ro-crate
+  Accept: text/html           -> 200 text/html         (the specification)
+  Accept: application/ld+json -> 200 application/ld+json (the Profile Crate)
+```
+
+Term IRIs such as <https://w3id.org/quilt/ro-crate#packageName> resolve to the
+specification page and scroll to the definition.
 
 ## Contributing
 
