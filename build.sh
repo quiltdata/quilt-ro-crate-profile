@@ -81,3 +81,45 @@ echo "wrote $VERSION/index.html"
 
 cp "$VERSION/ro-crate-metadata.json" "$VERSION/ro-crate-metadata.jsonld"
 echo "wrote $VERSION/ro-crate-metadata.jsonld (content-type alias)"
+
+# Root landing page listing the published versions.
+#
+# .nojekyll disables Jekyll, which means GitHub Pages does not render README.md as a
+# directory index. Without this file the Pages root would 404. Generated here so that
+# adding a version directory keeps the list accurate.
+{
+  cat <<'ROOTHEAD'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quilt RO-Crate profile</title>
+<style>
+ body{font-family:system-ui,-apple-system,sans-serif;line-height:1.55;max-width:40rem;
+      margin:3rem auto;padding:0 1rem;color:#1b1b1b}
+ a{color:#0b5cad} code{font-family:ui-monospace,Menlo,monospace;font-size:.9em}
+ li{margin:.35rem 0}
+</style>
+</head>
+<body>
+<h1>Quilt RO-Crate profile</h1>
+<p>An <a href="https://www.researchobject.org/ro-crate/">RO-Crate</a> profile for crates
+ingested into <a href="https://docs.quiltdata.com/">Quilt</a> packages.</p>
+<h2>Versions</h2>
+<ul>
+ROOTHEAD
+  for d in $(ls -d [0-9]*/ 2>/dev/null | tr -d / | sort -rV); do
+    printf '<li><a href="%s/">%s</a> &mdash; ' "$d" "$d"
+    printf '<a href="%s/ro-crate-metadata.json">Profile Crate</a>, ' "$d"
+    printf '<a href="%s/example1/ro-crate-metadata.json">example</a></li>\n' "$d"
+  done
+  cat <<'ROOTFOOT'
+</ul>
+<p>Source, issues and the full specification source:
+<a href="https://github.com/quiltdata/quilt-ro-crate-profile">github.com/quiltdata/quilt-ro-crate-profile</a></p>
+</body>
+</html>
+ROOTFOOT
+} > index.html
+echo "wrote index.html (root version index)"
