@@ -1,0 +1,5 @@
+# Local validation environment and cached RO-Crate context
+.venv/
+.cache/
+__pycache__/
+*.pyc

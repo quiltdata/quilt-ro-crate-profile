@@ -1,0 +1,164 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.2/context",
+  "@graph": [
+    {
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "about": { "@id": "https://w3id.org/quilt/ro-crate/0.1" },
+      "conformsTo": { "@id": "https://w3id.org/ro/crate/1.2" },
+      "license": { "@id": "https://creativecommons.org/publicdomain/zero/1.0/" }
+    },
+
+    {
+      "@id": "https://w3id.org/quilt/ro-crate/0.1",
+      "@type": ["Dataset", "Profile"],
+      "identifier": "https://w3id.org/quilt/ro-crate/0.1",
+      "name": "Quilt RO-Crate profile",
+      "description": "Profile for RO-Crates that are ingested into Quilt packages. Constrains how the target package name, the set of files to package, the responsible people and organizations, the acquiring instrument, and the originating electronic lab notebook entry are expressed, so that a packaging system can consume the crate without site-specific configuration.",
+      "version": "0.1.0",
+      "datePublished": "2026-09-24",
+      "license": { "@id": "https://www.apache.org/licenses/LICENSE-2.0" },
+      "author": { "@id": "https://quiltdata.com/" },
+      "keywords": ["packaging", "provenance", "instrument data", "electronic lab notebook"],
+      "isProfileOf": { "@id": "https://w3id.org/ro/crate/1.2" },
+      "hasPart": [
+        { "@id": "index.html" },
+        { "@id": "example1/" },
+        { "@id": "https://w3id.org/quilt/ro-crate#" },
+        { "@id": "https://w3id.org/ro/wfrun/process/0.6" }
+      ],
+      "hasResource": [
+        { "@id": "#hasSpecification" },
+        { "@id": "#hasVocabulary" },
+        { "@id": "#hasExample" },
+        { "@id": "#shouldConformToProcessRun" }
+      ]
+    },
+
+    {
+      "@id": "https://w3id.org/ro/crate/1.2",
+      "@type": ["CreativeWork", "Profile"],
+      "name": "RO-Crate 1.2",
+      "version": "1.2"
+    },
+
+    {
+      "@id": "index.html",
+      "@type": "File",
+      "name": "Quilt RO-Crate profile specification",
+      "encodingFormat": "text/html",
+      "about": { "@id": "https://w3id.org/quilt/ro-crate/0.1" }
+    },
+    {
+      "@id": "#hasSpecification",
+      "@type": "ResourceDescriptor",
+      "hasRole": { "@id": "http://www.w3.org/ns/dx/prof/role/specification" },
+      "hasArtifact": { "@id": "index.html" }
+    },
+
+    {
+      "@id": "https://w3id.org/quilt/ro-crate#",
+      "@type": "DefinedTermSet",
+      "name": "Namespace for the Quilt RO-Crate profile",
+      "url": "https://w3id.org/quilt/ro-crate",
+      "hasDefinedTerm": [
+        { "@id": "https://w3id.org/quilt/ro-crate#packageName" },
+        { "@id": "https://w3id.org/quilt/ro-crate#packageNamespace" },
+        { "@id": "https://w3id.org/quilt/ro-crate#ELNEntry" }
+      ]
+    },
+    {
+      "@id": "#hasVocabulary",
+      "@type": "ResourceDescriptor",
+      "hasRole": { "@id": "http://www.w3.org/ns/dx/prof/role/vocabulary" },
+      "hasArtifact": { "@id": "https://w3id.org/quilt/ro-crate#" }
+    },
+
+    {
+      "@id": "https://w3id.org/quilt/ro-crate#packageName",
+      "@type": "DefinedTerm",
+      "termCode": "packageName",
+      "name": "package name",
+      "rdfs:label": "package name",
+      "description": "Identifies a PropertyValue whose value is the fully qualified name of the Quilt package to build, in the form namespace/name. Used as the value of propertyID, not as a JSON-LD key. Takes precedence over packageNamespace.",
+      "rdfs:comment": "Identifies a PropertyValue whose value is the fully qualified name of the Quilt package to build, in the form namespace/name. Used as the value of propertyID, not as a JSON-LD key. Takes precedence over packageNamespace.",
+      "inDefinedTermSet": { "@id": "https://w3id.org/quilt/ro-crate#" }
+    },
+    {
+      "@id": "https://w3id.org/quilt/ro-crate#packageNamespace",
+      "@type": "DefinedTerm",
+      "termCode": "packageNamespace",
+      "name": "package namespace",
+      "rdfs:label": "package namespace",
+      "description": "Identifies a PropertyValue whose value is the namespace portion only of the Quilt package name. The name portion is derived from the name of the root data entity. Used as the value of propertyID, not as a JSON-LD key.",
+      "rdfs:comment": "Identifies a PropertyValue whose value is the namespace portion only of the Quilt package name. The name portion is derived from the name of the root data entity. Used as the value of propertyID, not as a JSON-LD key.",
+      "inDefinedTermSet": { "@id": "https://w3id.org/quilt/ro-crate#" }
+    },
+    {
+      "@id": "https://w3id.org/quilt/ro-crate#ELNEntry",
+      "@type": ["DefinedTerm", "rdfs:Class"],
+      "termCode": "ELNEntry",
+      "name": "Electronic lab notebook entry",
+      "rdfs:label": "Electronic lab notebook entry",
+      "description": "An entry in an electronic lab notebook that documents the experiment a crate records. Used as the value of additionalType on a CreativeWork. The notebook system is identified by provider, which keeps the term independent of any one vendor.",
+      "rdfs:comment": "An entry in an electronic lab notebook that documents the experiment a crate records. Used as the value of additionalType on a CreativeWork. The notebook system is identified by provider, which keeps the term independent of any one vendor.",
+      "rdfs:subClassOf": { "@id": "http://schema.org/CreativeWork" },
+      "inDefinedTermSet": { "@id": "https://w3id.org/quilt/ro-crate#" }
+    },
+
+    {
+      "@id": "example1/",
+      "@type": "Dataset",
+      "name": "Example Quilt RO-Crate",
+      "description": "A flow cytometry acquisition expressed under this profile. Conforms to both this profile and Process Run Crate.",
+      "conformsTo": [
+        { "@id": "https://w3id.org/quilt/ro-crate/0.1" },
+        { "@id": "https://w3id.org/ro/wfrun/process/0.6" }
+      ],
+      "subjectOf": { "@id": "example1/ro-crate-metadata.json" }
+    },
+    {
+      "@id": "example1/ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "encodingFormat": "application/ld+json"
+    },
+    {
+      "@id": "#hasExample",
+      "@type": "ResourceDescriptor",
+      "hasRole": { "@id": "http://www.w3.org/ns/dx/prof/role/example" },
+      "hasArtifact": { "@id": "example1/" }
+    },
+
+    {
+      "@id": "https://w3id.org/ro/wfrun/process/0.6",
+      "@type": ["CreativeWork", "Profile"],
+      "name": "Process Run Crate",
+      "version": "0.6"
+    },
+    {
+      "@id": "#shouldConformToProcessRun",
+      "@type": "ResourceDescriptor",
+      "hasRole": { "@id": "http://purl.org/dc/terms/conformsTo" },
+      "hasArtifact": { "@id": "https://w3id.org/ro/wfrun/process/0.6" }
+    },
+
+    {
+      "@id": "https://quiltdata.com/",
+      "@type": "Organization",
+      "name": "Quilt Data, Inc.",
+      "url": "https://quiltdata.com/"
+    },
+    {
+      "@id": "https://www.apache.org/licenses/LICENSE-2.0",
+      "@type": "CreativeWork",
+      "name": "Apache License 2.0",
+      "description": "The profile specification text is licensed under the Apache License, Version 2.0."
+    },
+    {
+      "@id": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "@type": "CreativeWork",
+      "name": "CC0 1.0 Universal",
+      "description": "The metadata in this Profile Crate is dedicated to the public domain."
+    }
+  ]
+}
