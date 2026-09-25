@@ -62,9 +62,11 @@ drift. Changing a redirect target means another pull request there.
 
 ## Complying with the profile
 
-**If you produce crates**, only two things are required: list every file to package in the
-root entity's `hasPart`, and, if you name the package, give a valid name. Everything else in
-[`spec/profile.md`](spec/profile.md) is a recommendation. Follow it and a consumer can index
+**If you produce crates**, the requirements come down to two things: list every file to
+package in the root entity's `hasPart`, and, if you name the package, give a valid name.
+The [producer requirements](spec/profile.md#producer-requirements) state the exact rules
+for paths, directories, logical keys, ids and names. Everything else for producers is a
+[recommendation](spec/profile.md#producer-recommendations). Follow it and a consumer can index
 the crate's people, instrument and notebook entry for search; depart from it and the crate
 is still packaged. Compare against
 [`0.1/example1/ro-crate-metadata.json`](0.1/example1/ro-crate-metadata.json), which follows

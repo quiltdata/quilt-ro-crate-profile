@@ -123,6 +123,10 @@ product cannot generalize to a second product. A typed entity with a <code>provi
 <li>An <code>http://</code> or <code>https://</code> member is a reference to something on the web rather than an
   object that can be packaged, and is left out of the package. (nf-prov, for instance, lists
   the license URL there.)</li>
+<li>Members MUST map to distinct logical keys. Two absolute <code>s3://</code> members with the same
+  basename collide, as do two directories that expand to one key holding different
+  objects. A file listed explicitly that a directory member also covers is fine when both
+  name the same object; the file keeps its entry metadata.</li>
 <li>Two entities MUST NOT share an <code>@id</code> with different content. A verbatim repeat, which some
   emitters produce, is treated as one entity.</li>
 </ul>
@@ -188,7 +192,8 @@ data entity:</p>
 </ul>
 <h3 id="file-entities">File entities</h3>
 <p>Each <code>File</code> SHOULD carry <code>name</code>, <code>encodingFormat</code>, <code>contentSize</code>, <code>dateCreated</code>,
-<code>dateModified</code> and <code>sha256</code>. A consumer attaches these to the package entry.</p>
+<code>dateModified</code> and <code>sha256</code>. A consumer attaches every property except <code>@id</code>, <code>@type</code> and
+<code>name</code> to the package entry, whose logical key already names the file.</p>
 <p><code>dateCreated</code> and <code>dateModified</code> SHOULD be the times the instrument produced the data, not
 the times the files were transferred or copied. Object stores overwrite filesystem
 timestamps on upload, so these properties are frequently the only surviving record of when
@@ -373,8 +378,9 @@ inline the same as one referenced by <code>@id</code>.</p>
 <p><strong>Provenance.</strong> The consumer MUST include <code>ro-crate-metadata.json</code> in the package, so the
 package records, verbatim, the graph it was built from.</p>
 <p><strong>Rejection.</strong> The consumer MUST reject a crate it cannot package as written — a <code>hasPart</code>
-member it cannot resolve, an invalid or conflicting explicit name, two different entities
-with one <code>@id</code> — rather than package part of it. It MUST NOT reject a crate for departing
+member it cannot resolve, two members that map to one logical key, an invalid or
+conflicting explicit name, two different entities with one <code>@id</code> — rather than package
+part of it. It MUST NOT reject a crate for departing
 from a recommendation, and declaring conformance to this profile does not change how a
 crate is processed. It SHOULD decode a UTF-8 byte-order mark rather than fail on one.</p>
 <h2 id="validation">Validation</h2>

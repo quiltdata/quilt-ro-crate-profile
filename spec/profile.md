@@ -93,6 +93,10 @@ product cannot generalize to a second product. A typed entity with a `provider` 
 - An `http://` or `https://` member is a reference to something on the web rather than an
   object that can be packaged, and is left out of the package. (nf-prov, for instance, lists
   the license URL there.)
+- Members MUST map to distinct logical keys. Two absolute `s3://` members with the same
+  basename collide, as do two directories that expand to one key holding different
+  objects. A file listed explicitly that a directory member also covers is fine when both
+  name the same object; the file keeps its entry metadata.
 - Two entities MUST NOT share an `@id` with different content. A verbatim repeat, which some
   emitters produce, is treated as one entity.
 
@@ -170,7 +174,8 @@ data entity:
 ### File entities
 
 Each `File` SHOULD carry `name`, `encodingFormat`, `contentSize`, `dateCreated`,
-`dateModified` and `sha256`. A consumer attaches these to the package entry.
+`dateModified` and `sha256`. A consumer attaches every property except `@id`, `@type` and
+`name` to the package entry, whose logical key already names the file.
 
 `dateCreated` and `dateModified` SHOULD be the times the instrument produced the data, not
 the times the files were transferred or copied. Object stores overwrite filesystem
@@ -373,8 +378,9 @@ inline the same as one referenced by `@id`.
 package records, verbatim, the graph it was built from.
 
 **Rejection.** The consumer MUST reject a crate it cannot package as written — a `hasPart`
-member it cannot resolve, an invalid or conflicting explicit name, two different entities
-with one `@id` — rather than package part of it. It MUST NOT reject a crate for departing
+member it cannot resolve, two members that map to one logical key, an invalid or
+conflicting explicit name, two different entities with one `@id` — rather than package
+part of it. It MUST NOT reject a crate for departing
 from a recommendation, and declaring conformance to this profile does not change how a
 crate is processed. It SHOULD decode a UTF-8 byte-order mark rather than fail on one.
 
