@@ -4,7 +4,7 @@
 #   ids/quilt/.htaccess   (this file)
 #   ids/quilt/README.md   (the README beside it)
 #
-# Contact: TODO set a maintainer name and email before opening the PR.
+# Contact: Ernest Prabhakar <ernest@quilt.bio>, Quilt Data, Inc.
 # Project: https://github.com/quiltdata/quilt-ro-crate-profile
 #
 # Modelled on ids/ro/wfrun/process/.htaccess, which serves the Process Run Crate

@@ -4,8 +4,9 @@ Destination: a pull request to <https://github.com/perma-id/w3id.org> adding thi
 `ids/quilt/README.md`, alongside the `.htaccess` in this directory as
 `ids/quilt/.htaccess`.
 
-**Not yet submitted.** Until it is merged, `https://w3id.org/quilt/ro-crate` does not
-resolve and every reference to it in this repository is forward-looking.
+Until that pull request is merged, `https://w3id.org/quilt/ro-crate` does not resolve and
+every reference to it in this repository is forward-looking. The GitHub Pages URLs it
+redirects to are live now.
 
 ## Namespace
 
@@ -28,8 +29,7 @@ GitHub Pages.
 
 ## Contact
 
-TODO: maintainer name and email before submitting the PR. The w3id maintainers ask for
-contact details in either this file or an `.htaccess` comment.
+Ernest Prabhakar <ernest@quilt.bio>, Quilt Data, Inc.
 
 ## Notes
 
@@ -43,6 +43,8 @@ Common Provenance Model profile, whose terms sit at
 - [x] GitHub Pages enabled on the project repo, and the served URL confirmed
 - [x] `0.1/index.html` and `0.1/ro-crate-metadata.jsonld` reachable at that URL, with
       `application/ld+json` returned for the latter
-- [ ] Maintainer contact filled in above and in the `.htaccess` header
-- [ ] Rules tested against a local checkout of the w3id site
-- [ ] Commits squashed, commit message naming the project rather than "Create .htaccess"
+- [x] Maintainer contact filled in above and in the `.htaccess` header
+- [x] Single commit, message naming the project rather than "Create .htaccess"
+- [ ] Rules exercised against a local checkout of the w3id site (the maintainers ask for
+      this; the rules here are modelled directly on `ids/ro/wfrun/process/.htaccess` but
+      have not been run through Apache)
