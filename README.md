@@ -111,14 +111,25 @@ See [`docs/publishing.md`](docs/publishing.md) for the full sequence and the rea
 
 Current state:
 
-- [ ] GitHub Pages enabled and the served URL confirmed
+- [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
 - [ ] `https://w3id.org/quilt/ro-crate` registered via a PR to `perma-id/w3id.org`
 - [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/)
 - [ ] SHACL shape added under the `validation` role
 - [ ] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
 
-Until the first two are done, every `https://w3id.org/quilt/...` URI in this repository is
-forward-looking and does not resolve.
+Pages serves the content types the w3id rules depend on. Verified against the live site:
+
+| URL | Content-Type |
+|---|---|
+| [`/0.1/`](https://quiltdata.github.io/quilt-ro-crate-profile/0.1/) | `text/html; charset=utf-8` |
+| [`/0.1/ro-crate-metadata.json`](https://quiltdata.github.io/quilt-ro-crate-profile/0.1/ro-crate-metadata.json) | `application/json; charset=utf-8` |
+| [`/0.1/ro-crate-metadata.jsonld`](https://quiltdata.github.io/quilt-ro-crate-profile/0.1/ro-crate-metadata.jsonld) | `application/ld+json` |
+
+This is why the `.jsonld` alias exists, and why the w3id rules negotiate to it rather than to
+the `.json` the RO-Crate specification requires as a filename.
+
+Until the w3id registration is merged, every `https://w3id.org/quilt/...` URI in this
+repository is forward-looking and does not resolve. The Pages URLs above work now.
 
 ## Contributing
 

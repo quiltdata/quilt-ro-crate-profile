@@ -11,9 +11,10 @@
 # profile. Content negotiation has to happen here: GitHub Pages cannot negotiate, it
 # only maps file extensions to content types.
 #
-# NOTE: the redirect targets below assume GitHub Pages is enabled on the project repo
-# and serving from its default URL. Confirm that, or substitute a custom domain, before
-# opening the PR -- changing the target afterwards needs another PR.
+# The redirect targets below are live and verified: GitHub Pages serves this project at
+# https://quiltdata.github.io/quilt-ro-crate-profile/ , with .jsonld returned as
+# application/ld+json and .html as text/html. If a custom domain is adopted later these
+# targets must be updated, which needs another PR here.
 
 AddType application/ld+json .jsonld
 

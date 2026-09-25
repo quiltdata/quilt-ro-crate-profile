@@ -40,8 +40,9 @@ Common Provenance Model profile, whose terms sit at
 
 ## Checklist before opening the PR
 
-- [ ] GitHub Pages enabled on the project repo, and the served URL confirmed
-- [ ] `0.1/index.html` and `0.1/ro-crate-metadata.jsonld` reachable at that URL
+- [x] GitHub Pages enabled on the project repo, and the served URL confirmed
+- [x] `0.1/index.html` and `0.1/ro-crate-metadata.jsonld` reachable at that URL, with
+      `application/ld+json` returned for the latter
 - [ ] Maintainer contact filled in above and in the `.htaccess` header
 - [ ] Rules tested against a local checkout of the w3id site
 - [ ] Commits squashed, commit message naming the project rather than "Create .htaccess"

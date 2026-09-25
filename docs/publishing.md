@@ -122,8 +122,11 @@ term IRIs resolve but land nowhere useful.
 
 ## Sequence
 
-1. Enable GitHub Pages on this repository and confirm the served URL.
-2. Verify `0.1/index.html` and `0.1/ro-crate-metadata.jsonld` are reachable there.
+1. ~~Enable GitHub Pages and confirm the served URL.~~ **Done** — serving from `main` at the
+   repository root, at <https://quiltdata.github.io/quilt-ro-crate-profile/>.
+2. ~~Verify the specification and the Profile Crate are reachable with the right content
+   types.~~ **Done** — see the table in the repository README. `.jsonld` is served as
+   `application/ld+json` and the served bytes are identical to the committed file.
 3. Fill in maintainer contact in [`../w3id/README.md`](../w3id/README.md) and the
    `.htaccess` header.
 4. Open the pull request against `perma-id/w3id.org`.
@@ -135,8 +138,15 @@ term IRIs resolve but land nowhere useful.
 6. Submit to the [RO-Crate profiles registry](https://profiles.ro-crate.org/), which extracts
    its metadata from the Profile Crate.
 
-Steps 1 and 4 are the hard blockers. Until both are done, every `w3id.org/quilt/...` URI in
+Step 4 is now the only hard blocker. Until it is merged, every `w3id.org/quilt/...` URI in
 this repository is forward-looking.
+
+### A note on `.nojekyll`
+
+This repository disables Jekyll, so Pages serves every file verbatim rather than letting
+Jekyll decide what to publish. The tradeoff is that Pages no longer renders `README.md` as a
+directory index, so the site root would 404; [`../build.sh`](../build.sh) generates a root
+`index.html` listing the published versions instead.
 
 ## Sources
 
