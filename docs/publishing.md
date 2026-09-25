@@ -148,7 +148,14 @@ term IRIs resolve but land nowhere useful.
    version, `isProfileOf`, all three terms and all four resource roles. Term IRIs resolve to
    the specification page with matching anchors.
 6. Submit to the [RO-Crate profiles registry](https://profiles.ro-crate.org/), which extracts
-   its metadata from the Profile Crate. **Outstanding** — the only remaining step.
+   its metadata from the Profile Crate. Submission is a pull request appending the profile URI
+   to `scripts/profile_urls.txt` in
+   [eScienceLab/RO-Crate-Profile-Portal](https://github.com/eScienceLab/RO-Crate-Profile-Portal);
+   its check runs `upload_profiles.py --dry-run`, which fetches the URI with
+   `Accept: application/ld+json` and requires a `prof:Profile` entity. The versioned w3id URI
+   `https://w3id.org/quilt/ro-crate/0.1` passes locally. **Submitted** as
+   [#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting maintainer
+   review; the check needs a maintainer to approve it because the pull request comes from a fork.
 
 Elapsed time for step 4: the pull request was opened and merged the same day.
 

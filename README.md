@@ -117,7 +117,8 @@ Current state:
 
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
 - [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
-- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/)
+- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): submitted as
+  [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting review
 - [ ] SHACL shape added under the `validation` role
 - [x] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
 
