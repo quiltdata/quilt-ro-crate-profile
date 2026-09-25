@@ -16,7 +16,7 @@ Exits non-zero on any failure, so it is usable as a pre-publish gate or in CI.
 import json, os, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.1"
+VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.2"
 BASE = os.path.join(HERE, VERSION)
 CONTEXT_URL = "https://w3id.org/ro/crate/1.2/context"
 

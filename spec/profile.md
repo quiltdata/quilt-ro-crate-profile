@@ -1,6 +1,6 @@
 # Quilt RO-Crate profile
 
-Version 0.1.0 — 2026-09-24 — **draft**
+Version 0.2.0 — 2026-09-25 — **draft**
 
 An [RO-Crate](https://www.researchobject.org/ro-crate/) profile for crates that are
 ingested into [Quilt](https://docs.quiltdata.com/) packages.
@@ -8,7 +8,8 @@ ingested into [Quilt](https://docs.quiltdata.com/) packages.
 | | |
 |---|---|
 | Profile URI | <https://w3id.org/quilt/ro-crate> |
-| This version | `https://w3id.org/quilt/ro-crate/0.1` |
+| This version | `https://w3id.org/quilt/ro-crate/0.2` |
+| Previous version | [`https://w3id.org/quilt/ro-crate/0.1`](https://w3id.org/quilt/ro-crate/0.1) |
 | Term namespace | `https://w3id.org/quilt/ro-crate#` |
 | `isProfileOf` | [RO-Crate 1.2](https://w3id.org/ro/crate/1.2) minimum; [1.3](https://w3id.org/ro/crate/1.3) permitted |
 | Recommended companion | [Process Run Crate 0.6](https://w3id.org/ro/wfrun/process/0.6) |
@@ -317,7 +318,7 @@ domain-specific metadata independent of this profile's versioning.
 ## Terms defined by this profile
 
 Three, all `DefinedTerm`, all referenced by `@id` only. They are defined in the
-[Profile Crate](../0.1/ro-crate-metadata.json) and, per the
+[Profile Crate](../0.2/ro-crate-metadata.json) and, per the
 [profiles specification](https://www.researchobject.org/ro-crate/specification/1.2/profiles.html),
 need not be repeated in each conforming crate.
 
