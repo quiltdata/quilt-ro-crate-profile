@@ -26,9 +26,9 @@ the usual mistake.
 
 | Artifact | Role | Here |
 |---|---|---|
-| Profile description | Human-readable spec. The profile URI MUST resolve to this | [`0.1/index.html`](0.1/index.html), generated from [`spec/profile.md`](spec/profile.md) |
-| Profile Crate | Machine-readable RO-Crate that *is* the profile. Defines the terms and names the artifacts and their roles | [`0.1/ro-crate-metadata.json`](0.1/ro-crate-metadata.json) |
-| Conforming crate | A crate that *uses* the profile, via `conformsTo` on its root | [`0.1/example1/ro-crate-metadata.json`](0.1/example1/ro-crate-metadata.json) |
+| Profile description | Human-readable spec. The profile URI MUST resolve to this | [`0.2/index.html`](0.2/index.html), generated from [`spec/profile.md`](spec/profile.md) |
+| Profile Crate | Machine-readable RO-Crate that *is* the profile. Defines the terms and names the artifacts and their roles | [`0.2/ro-crate-metadata.json`](0.2/ro-crate-metadata.json) |
+| Conforming crate | A crate that *uses* the profile, via `conformsTo` on its root | [`0.2/example1/ro-crate-metadata.json`](0.2/example1/ro-crate-metadata.json) |
 
 The Profile Crate is the one people skip, and skipping it has a concrete cost: the three
 terms this profile defines would be referenced by conforming crates and defined nowhere. The
@@ -39,8 +39,9 @@ exists.
 ## Layout
 
 ```
-spec/profile.md            source of truth for the specification
-0.1/
+spec/profile.md            source of truth for the current version's specification
+0.1/                       a published version, frozen
+0.2/                       the current version
   index.html               generated specification        (role: specification)
   ro-crate-metadata.json   the Profile Crate
   ro-crate-metadata.jsonld content-type alias, generated
@@ -62,19 +63,21 @@ drift. Changing a redirect target means another pull request there.
 
 ## Complying with the profile
 
-**If you produce crates**, work through the producer requirements in
-[`spec/profile.md`](spec/profile.md) and compare against
-[`0.1/example1/ro-crate-metadata.json`](0.1/example1/ro-crate-metadata.json), which is a
-complete conforming crate. The short version: declare `conformsTo` on the root entity, list
-every file in `hasPart`, give people absolute identifiers, record acquisition as a
-`CreateAction` reachable from `mentions`, and express anything domain-specific with
-`variableMeasured` rather than inventing JSON keys.
+**If you produce crates**, the requirements come down to two things: list every file to
+package in the root entity's `hasPart`, and, if you name the package, give a valid name.
+The [producer requirements](spec/profile.md#producer-requirements) state the exact rules
+for paths, directories, logical keys, ids and names. Everything else for producers is a
+[recommendation](spec/profile.md#producer-recommendations). Follow it and a consumer can index
+the crate's people, instrument and notebook entry for search; depart from it and the crate
+is still packaged. Compare against
+[`0.2/example1/ro-crate-metadata.json`](0.2/example1/ro-crate-metadata.json), which follows
+every recommendation.
 
 **If you consume crates**, the consumer requirements are normative too. A conforming
 consumer packages exactly what `hasPart` lists, resolves the package name in a defined
-order, preserves the graph verbatim, keeps the instrument's timestamps on the package
-entries, and rejects rather than partially ingests a crate that claims conformance and fails
-it.
+order, preserves the graph verbatim, and keeps the instrument's timestamps on the package
+entries. It rejects a crate only when it cannot package it as written, and never for
+departing from a recommendation.
 
 A conforming crate needs **no `@context` extension**. All three profile terms are used in
 `propertyID` and `additionalType` positions, which take IRIs rather than introducing JSON-LD
@@ -86,8 +89,8 @@ silently dropped.
 ```sh
 python3 -m venv .venv && .venv/bin/pip install pyld requests markdown
 
-./build.sh 0.1                  # regenerate index.html and the .jsonld alias
-.venv/bin/python validate.py    # structural checks
+./build.sh 0.2                  # regenerate index.html and the .jsonld alias
+.venv/bin/python validate.py    # structural checks (pass a version to check another)
 ```
 
 `build.sh` needs `markdown_py` from
@@ -117,6 +120,9 @@ Current state:
 
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
 - [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
+- [ ] Unversioned URI moved from 0.1 to 0.2. `/0.2` resolves as soon as Pages serves it, but
+  the unversioned URI is pinned in the w3id rules, so it needs a w3id pull request once 0.2
+  is live. `w3id/` is updated with that pull request, not before.
 - [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): submitted as
   [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting review
 - [ ] SHACL shape added under the `validation` role
@@ -148,7 +154,9 @@ specification page and scroll to the definition.
 
 Issues and pull requests welcome. Two rules that keep the artifacts consistent:
 
-- Edit `spec/profile.md`, never `0.1/index.html`. Run `./build.sh` and commit both.
+- Edit `spec/profile.md`, never a generated `index.html`. Run `./build.sh` for the current
+  version and commit both. A published version's directory is frozen; `spec/profile.md`
+  describes only the current one.
 - Run `validate.py` before opening a pull request. It is meant to be usable as a CI gate.
 
 Changes that add or remove a normative requirement need a version bump. Terms already

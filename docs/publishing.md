@@ -120,6 +120,21 @@ profile URI. It resolves to the profile page, and that page needs matching ancho
 browser to land on the definition. [`../build.sh`](../build.sh) emits them; without them the
 term IRIs resolve but land nowhere useful.
 
+
+### Releasing a new version
+
+1. Copy the current version directory to the new `MAJOR.MINOR`, and update the Profile
+   Crate's `@id`, `identifier`, `version` and `datePublished`, and the example's
+   `conformsTo` and Profile entity, to the new URI.
+2. Update the header of `spec/profile.md` and the default version in `build.sh` and
+   `validate.py`, then run `./build.sh` and `validate.py` for the new version. Leave the
+   previous directory untouched: its URI is permanent, so its content is too.
+3. Once Pages serves the new directory, the versioned URI already resolves, since the w3id
+   rules route any `MAJOR.MINOR`. The unversioned URI is pinned to a directory, so open a
+   w3id pull request to repoint its two rules, and update `w3id/` in the same change.
+4. Add the new versioned URI to the RO-Crate profiles registry; earlier versions stay
+   listed.
+
 ## Sequence
 
 1. ~~Enable GitHub Pages and confirm the served URL.~~ **Done** — serving from `main` at the

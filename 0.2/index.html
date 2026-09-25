@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quilt RO-Crate profile</title>
+<style>
+ body{font-family:system-ui,-apple-system,sans-serif;line-height:1.55;max-width:46rem;
+      margin:2rem auto;padding:0 1rem;color:#1b1b1b}
+ code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+ pre{background:#f6f6f6;padding:.75rem;overflow-x:auto;border-radius:4px}
+ table{border-collapse:collapse;width:100%;margin:1rem 0}
+ th,td{border:1px solid #ddd;padding:.4rem .6rem;text-align:left;vertical-align:top}
+ th{background:#f6f6f6}
+ h1,h2,h3{line-height:1.25}
+ blockquote{border-left:3px solid #ddd;margin-left:0;padding-left:1rem;color:#555}
+ dfn{font-weight:600;font-style:normal}
+ a{color:#0b5cad}
+</style>
+</head>
+<body>
+<p><em>Generated from <code>spec/profile.md</code> by <code>build.sh</code>.
+Do not edit directly.</em></p>
+<h1 id="quilt-ro-crate-profile">Quilt RO-Crate profile</h1>
+<p>Version 0.2.0 — 2026-09-25 — <strong>draft</strong></p>
+<p>An <a href="https://www.researchobject.org/ro-crate/">RO-Crate</a> profile for crates that are
+ingested into <a href="https://docs.quiltdata.com/">Quilt</a> packages.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Profile URI</td>
+<td><a href="https://w3id.org/quilt/ro-crate">https://w3id.org/quilt/ro-crate</a></td>
+</tr>
+<tr>
+<td>This version</td>
+<td><code>https://w3id.org/quilt/ro-crate/0.2</code></td>
+</tr>
+<tr>
+<td>Previous version</td>
+<td><a href="https://w3id.org/quilt/ro-crate/0.1"><code>https://w3id.org/quilt/ro-crate/0.1</code></a></td>
+</tr>
+<tr>
+<td>Term namespace</td>
+<td><code>https://w3id.org/quilt/ro-crate#</code></td>
+</tr>
+<tr>
+<td><code>isProfileOf</code></td>
+<td><a href="https://w3id.org/ro/crate/1.2">RO-Crate 1.2</a> minimum; <a href="https://w3id.org/ro/crate/1.3">1.3</a> permitted</td>
+</tr>
+<tr>
+<td>Recommended companion</td>
+<td><a href="https://w3id.org/ro/wfrun/process/0.6">Process Run Crate 0.6</a></td>
+</tr>
+<tr>
+<td>Source</td>
+<td><a href="https://github.com/quiltdata/quilt-ro-crate-profile">https://github.com/quiltdata/quilt-ro-crate-profile</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="purpose">Purpose</h2>
+<p>Instruments and acquisition software increasingly emit an <code>ro-crate-metadata.json</code>
+alongside their output. That graph already names the files produced, who ran the
+experiment, on which instrument, and when. A profile lets a packaging system read it
+directly instead of requiring a separate, system-specific manifest.</p>
+<p>This profile <strong>requires</strong> only what a packaging system needs to build the package a crate
+describes:</p>
+<ol>
+<li>the exact set of files to package</li>
+<li>the target package name, when the producer chooses one</li>
+</ol>
+<p>It <strong>recommends</strong> how to express three more things, so that a consumer can index them for
+search without site-specific configuration:</p>
+<ol>
+<li>the people and organizations responsible</li>
+<li>the instrument that produced the data, and the acquisition event</li>
+<li>the electronic lab notebook entry the work belongs to</li>
+</ol>
+<p>Everything else is up to the producer, and is passed through untouched.</p>
+<h2 id="conformance">Conformance</h2>
+<p>The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT, RECOMMENDED, MAY and OPTIONAL
+are to be interpreted as described in <a href="https://www.rfc-editor.org/rfc/rfc2119">RFC 2119</a>.</p>
+<p>Requirements are split between <strong>producers</strong> (whatever writes the crate) and <strong>consumers</strong>
+(whatever reads it to build a package). Both sets are normative.</p>
+<p>A crate that meets the <a href="#producer-requirements">producer requirements</a> conforms. The
+<a href="#producer-recommendations">producer recommendations</a> are SHOULDs: a crate that departs from
+one still conforms and is still packaged, and the consumer derives less search metadata
+from it.</p>
+<h2 id="design-principles">Design principles</h2>
+<p>These explain why the requirements look the way they do. They are not themselves normative.</p>
+<p><strong>Require only what ingestion needs.</strong> A requirement exists only where getting it wrong
+would make the package wrong: files missing, or a package under a name the producer did not
+intend. How a crate models people, instruments, actions and notebook entries is the
+producer's decision. The recommendations are the patterns a consumer reads for search; a
+crate that models things differently loses those search fields, not its package.</p>
+<p><strong>schema.org first.</strong> <a href="https://www.researchobject.org/ro-crate/specification/1.3/appendix/jsonld.html#extending-ro-crate">RO-Crate's guidance</a>
+is to use existing schema.org terms, accepting a liberal reading, before inventing
+anything. Applied strictly, this profile needs three new terms.</p>
+<p><strong>No new JSON-LD keys.</strong> All three terms are <code>DefinedTerm</code>s referenced by <code>@id</code>, as values
+of <code>propertyID</code> and <code>additionalType</code>. Neither is a key position, so <strong>a conforming crate
+needs no <code>@context</code> extension</strong> and parses correctly under stock RO-Crate tooling. An
+unmapped term in a key or <code>@type</code> position is silently dropped by any JSON-LD processor;
+avoiding those positions removes a whole class of quiet data loss.</p>
+<p><strong>The crate does not model the consumer's search index.</strong> It is tempting to bend the crate
+so its keys match the facets a catalog wants to display. That inverts the dependency: the
+crate becomes unchangeable because a search schema depends on its shape. Instead, crates
+stay idiomatic and consumers derive whatever projection they need at ingest.</p>
+<p><strong>Vendor-neutral where the vendor is incidental.</strong> An <code>@type</code> naming a specific notebook
+product cannot generalize to a second product. A typed entity with a <code>provider</code> can.</p>
+<h2 id="producer-requirements">Producer requirements</h2>
+<h3 id="manifest">Manifest</h3>
+<ul>
+<li>The root data entity MUST declare a non-empty <code>hasPart</code> listing every file or directory
+  to be packaged. This list is the manifest.</li>
+<li>A relative <code>@id</code> in <code>hasPart</code> resolves against the folder holding
+  <code>ro-crate-metadata.json</code> and MUST stay inside it: no <code>.</code> or <code>..</code> segments, no empty
+  segments, no leading <code>/</code>. Being a URI reference, it is percent-decoded, so a <code>?</code> or <code>#</code>
+  that belongs to the key MUST be percent-encoded. An absolute <code>s3://</code> <code>@id</code> may name an object anywhere; its
+  basename becomes the package logical key.</li>
+<li>A directory MUST be typed <code>Dataset</code> or have an <code>@id</code> ending in <code>/</code>. It expands to every
+  object beneath that prefix.</li>
+<li>An <code>http://</code> or <code>https://</code> member is a reference to something on the web rather than an
+  object that can be packaged, and is left out of the package. (nf-prov, for instance, lists
+  the license URL there.)</li>
+<li>Members MUST map to distinct logical keys. Two absolute <code>s3://</code> members with the same
+  basename collide, as do two directories that expand to one key holding different
+  objects. A file listed explicitly that a directory member also covers is fine when both
+  name the same object; the file keeps its entry metadata.</li>
+<li>Two entities MUST NOT share an <code>@id</code> with different content. A verbatim repeat, which some
+  emitters produce, is treated as one entity.</li>
+</ul>
+<h3 id="package-naming">Package naming</h3>
+<p>Naming is optional; without it the consumer uses its own default. To choose the name, the
+root data entity carries one of the following under <code>identifier</code>.</p>
+<p>Fully qualified name:</p>
+<pre><code class="language-json">{
+  &quot;@id&quot;: &quot;#quilt-package-name&quot;,
+  &quot;@type&quot;: &quot;PropertyValue&quot;,
+  &quot;propertyID&quot;: &quot;https://w3id.org/quilt/ro-crate#packageName&quot;,
+  &quot;value&quot;: &quot;my-namespace/2026-09-08-assay-01&quot;
+}
+</code></pre>
+<p>Namespace only, with the name derived from the root entity's <code>name</code>:</p>
+<pre><code class="language-json">{
+  &quot;@id&quot;: &quot;#quilt-namespace&quot;,
+  &quot;@type&quot;: &quot;PropertyValue&quot;,
+  &quot;propertyID&quot;: &quot;https://w3id.org/quilt/ro-crate#packageNamespace&quot;,
+  &quot;value&quot;: &quot;my-namespace&quot;
+}
+</code></pre>
+<p>This mirrors how the base specification expresses a DOI: a <code>PropertyValue</code> under
+<code>identifier</code>, distinguished by <code>propertyID</code>. It needs no new JSON-LD key.</p>
+<ul>
+<li>A <code>packageName</code> value MUST already be a valid Quilt package name: two parts of letters,
+  digits, <code>_</code> or <code>-</code>, separated by one <code>/</code>. A <code>packageNamespace</code> value MUST be a valid first
+  part. Consumers reject rather than normalize, so that a malformed name surfaces at the
+  producer.</li>
+<li>A crate MUST NOT give two different values for either term.</li>
+<li>The root's <code>name</code> is a title written for people, so when it is joined to a
+  <code>packageNamespace</code> the consumer adapts it to the package-name grammar as the
+  <a href="#consumer-requirements">consumer requirements</a> define. A producer that needs an exact
+  name gives <code>packageName</code> instead.</li>
+</ul>
+<h2 id="producer-recommendations">Producer recommendations</h2>
+<p>Each recommendation below says what a consumer reads from it. A crate that departs from one
+is still packaged.</p>
+<h3 id="metadata-document">Metadata document</h3>
+<ul>
+<li>The RO-Crate Metadata Descriptor SHOULD set <code>conformsTo</code> to
+  <code>https://w3id.org/ro/crate/1.2</code> or <code>https://w3id.org/ro/crate/1.3</code>. Consumers determine
+  the RO-Crate version from this property, <a href="https://www.researchobject.org/ro-crate/specification/1.3/appendix/jsonld.html">not from <code>@context</code></a>.</li>
+<li><code>@context</code> SHOULD be the matching versioned RO-Crate context, with no additional entry.</li>
+<li>The document SHOULD be flattened and compacted, as RO-Crate asks: every entity a direct
+  child of <code>@graph</code>, every reference an object whose only key is <code>@id</code>.</li>
+<li>Properties SHOULD be omitted rather than given a <code>null</code> value.</li>
+<li>The file SHOULD be UTF-8 <strong>without</strong> a byte-order mark. A BOM makes strict JSON parsers
+  fail outright, and some common tooling adds one by default — notably Windows PowerShell's
+  <code>Out-File</code> and <code>ConvertTo-Json</code> before <code>-Encoding utf8NoBOM</code> was available.</li>
+</ul>
+<h3 id="root-data-entity">Root data entity</h3>
+<p>The <a href="https://www.researchobject.org/ro-crate/specification/1.3/root-data-entity.html">base specification</a>
+requires <code>name</code>, <code>description</code>, <code>datePublished</code> and <code>license</code> on the root data entity. This
+profile adds nothing to those requirements and does not enforce them. In addition, the root
+data entity:</p>
+<ul>
+<li>SHOULD declare <code>conformsTo</code> including <code>{"@id": "https://w3id.org/quilt/ro-crate"}</code>, with a
+  corresponding contextual entity typed <code>["CreativeWork", "Profile"]</code>. This tells readers and
+  tools which conventions the crate follows; it does not change how a consumer processes it.</li>
+<li>SHOULD declare <code>creator</code>, <code>producer</code>, <code>mentions</code> and <code>subjectOf</code>, which are what a consumer
+  reads for search metadata, as described below. <code>keywords</code> is also RECOMMENDED.</li>
+</ul>
+<h3 id="file-entities">File entities</h3>
+<p>Each <code>File</code> SHOULD carry <code>name</code>, <code>encodingFormat</code>, <code>contentSize</code>, <code>dateCreated</code>,
+<code>dateModified</code> and <code>sha256</code>. A consumer attaches every property except <code>@id</code>, <code>@type</code> and
+<code>name</code> to the package entry, whose logical key already names the file.</p>
+<p><code>dateCreated</code> and <code>dateModified</code> SHOULD be the times the instrument produced the data, not
+the times the files were transferred or copied. Object stores overwrite filesystem
+timestamps on upload, so these properties are frequently the only surviving record of when
+an experiment actually ran. The two are often equal; that is expected and correct.</p>
+<h3 id="people-and-organizations">People and organizations</h3>
+<p>A consumer reads the <code>name</code> of each root <code>creator</code> and <code>producer</code>, following
+<code>parentOrganization</code> from each producer.</p>
+<ul>
+<li>A <code>Person</code> <code>@id</code> SHOULD be an absolute URI — an <a href="https://orcid.org/">ORCID</a> where one
+  exists, otherwise a URI the institution controls. A bare fragment such as <code>#jdoe</code> is not
+  resolvable and not stable across crates.</li>
+<li><code>name</code> SHOULD be the human-readable full name, with a login, account or notebook handle
+  given as <code>alternateName</code>. Carrying both means nobody has to infer whether a handle in one
+  system matches an account name in another.</li>
+<li>A parent and child organization SHOULD both be <code>Organization</code>, linked from child to parent
+  with <code>parentOrganization</code>.</li>
+</ul>
+<h3 id="instruments-and-acquisition">Instruments and acquisition</h3>
+<p>A consumer finds instruments through the root's <code>mentions</code>: it reads the <code>name</code> and
+<code>identifier</code> of each listed action's <code>instrument</code>.</p>
+<p>To make an acquisition findable, record it following
+<a href="https://www.researchobject.org/workflow-run-crate/profiles/process_run_crate/">Process Run Crate</a>:
+a <code>CreateAction</code> carrying <code>instrument</code>, <code>agent</code>, <code>result</code> and <code>endTime</code>, listed under the
+root entity's <code>mentions</code>. Without <code>mentions</code> the action is unreachable from the root and a
+generic consumer cannot find it.</p>
+<p>A physical instrument SHOULD be an <code>IndividualProduct</code> — schema.org's type for a single
+identifiable unit — with an absolute URI as <code>@id</code>, a human-readable <code>name</code>, and an
+<code>identifier</code> unique to the instrument. It SHOULD also carry <code>manufacturer</code>, <code>model</code>, and
+<code>additionalType</code> referencing an ontology IRI for the instrument class; see
+<a href="../docs/ontology-iri-lookup.md">ontology-iri-lookup.md</a> for how to find one. The owning
+organization SHOULD link to the instrument with schema.org's existing <code>owns</code> property.</p>
+<p>Any other actions in the crate, such as software processing steps, are up to the producer.
+Process Run Crate describes how to record them, and declaring conformance to it alongside
+this profile is RECOMMENDED.</p>
+<h3 id="electronic-lab-notebook-entry">Electronic lab notebook entry</h3>
+<p>A consumer reads the <code>name</code> of each root <code>subjectOf</code> entity whose <code>additionalType</code> is
+<code>ELNEntry</code>.</p>
+<pre><code class="language-json">{
+  &quot;@id&quot;: &quot;https://eln.example.org/entries/etr_AbC123&quot;,
+  &quot;@type&quot;: &quot;CreativeWork&quot;,
+  &quot;additionalType&quot;: { &quot;@id&quot;: &quot;https://w3id.org/quilt/ro-crate#ELNEntry&quot; },
+  &quot;name&quot;: &quot;ASSAY-1234&quot;,
+  &quot;identifier&quot;: &quot;etr_AbC123&quot;,
+  &quot;url&quot;: &quot;https://eln.example.org/entries/etr_AbC123&quot;,
+  &quot;provider&quot;: { &quot;@id&quot;: &quot;#eln-vendor&quot; }
+}
+</code></pre>
+<p>The <code>@id</code> SHOULD be the resolvable entry URL, which makes the identifier globally unique
+without reserving any identifier space per vendor. <code>provider</code> SHOULD reference an
+<code>Organization</code> or <code>SoftwareApplication</code> naming the notebook system, which is what lets one
+consumer tell several notebook systems apart.</p>
+<h3 id="licensing">Licensing</h3>
+<p><code>license</code> is required on the root entity by the base specification. A consumer of this
+profile does not read it; this section is guidance for meeting that requirement when no
+public license applies — internal or proprietary data being the common case. Define a local
+<code>CreativeWork</code> and reference it identically from every crate:</p>
+<pre><code class="language-json">&quot;license&quot;: { &quot;@id&quot;: &quot;https://example.org/legal/internal-research-use/1.0&quot; },
+&quot;copyrightHolder&quot;: { &quot;@id&quot;: &quot;https://example.org/org/example-institute&quot; },
+&quot;copyrightYear&quot;: &quot;2026&quot;,
+&quot;conditionsOfAccess&quot;: &quot;Internal use only. Access governed by the owning group.&quot;,
+&quot;isAccessibleForFree&quot;: false
+</code></pre>
+<pre><code class="language-json">{
+  &quot;@id&quot;: &quot;https://example.org/legal/internal-research-use/1.0&quot;,
+  &quot;@type&quot;: &quot;CreativeWork&quot;,
+  &quot;name&quot;: &quot;Example Institute internal research use v1.0&quot;,
+  &quot;description&quot;: &quot;Proprietary and confidential. All rights reserved. Internal research use only; no redistribution or publication without written authorization.&quot;,
+  &quot;sameAs&quot;: &quot;http://rightsstatements.org/vocab/InC/1.0/&quot;
+}
+</code></pre>
+<p>Points worth noting:</p>
+<ul>
+<li><strong>Version the license URI.</strong> Revising the terms then does not silently re-license crates
+  already published.</li>
+<li><strong>The URI need not be publicly resolvable.</strong> The base specification says it SHOULD be the
+  license's URL; an intranet URL satisfies that. Carry the terms inline in <code>description</code> so
+  the crate remains self-describing when the URL is unreachable.</li>
+<li><strong><code>copyrightHolder</code> is the legal entity</strong>, distinct from <code>creator</code> (the individual) and
+  <code>producer</code> (the group). Three different claims.</li>
+<li><strong><code>license</code> and access control are different things.</strong> <code>license</code> states what may be done
+  with the data; <code>conditionsOfAccess</code> and <code>isAccessibleForFree</code> state who may obtain it.
+  Both are in the RO-Crate context. Note that while the base specification's section is
+  titled "Licensing, Access control and copyright", its body addresses <code>license</code> and
+  <code>copyrightHolder</code> only, so <code>conditionsOfAccess</code> here is ordinary schema.org rather than a
+  specific base-specification recommendation.</li>
+<li><strong><code>sameAs</code> to a <a href="https://rightsstatements.org/">RightsStatements.org</a> URI is OPTIONAL.</strong>
+  <code>InC</code> ("In Copyright") is a widely deployed controlled value for "copyrighted, not openly
+  licensed". That vocabulary was designed for cultural heritage collections, so it is a
+  serviceable rather than exact fit.</li>
+</ul>
+<p>Three things to avoid:</p>
+<ul>
+<li><strong>Do not apply a Creative Commons license to data that is not openly licensed.</strong> CC
+  grants are public and irrevocable. It is a one-way door, not a placeholder.</li>
+<li><strong>Do not use an SPDX identifier.</strong> SPDX has no listed identifier for proprietary terms;
+  <code>LicenseRef-</code> strings are a software-bill-of-materials convention.</li>
+<li><strong>Do not omit <code>license</code>.</strong> Omitting it makes the crate invalid rather than unlicensed.</li>
+</ul>
+<p>An alternative, used by the
+<a href="https://purl.archive.org/textcommons/profile">Language Data Commons profile</a>, is to ship
+the terms as a file inside the crate and point <code>license</code> at it. That maximizes
+self-containment and suits crates that travel between institutions, at the cost of
+duplicating the file into every crate.</p>
+<h3 id="additional-metadata">Additional metadata</h3>
+<p>Anything not covered above SHOULD be expressed with <code>variableMeasured</code> referencing a
+<code>PropertyValue</code> carrying <code>propertyID</code>, <code>value</code> and, where applicable, <code>unitText</code>. This may
+appear on the root entity or on individual files. It is the same pattern the
+<a href="https://github.com/TheELNConsortium/TheELNFileFormat">ELN file format</a> uses, including <code>.</code>
+as a nesting separator within <code>propertyID</code>.</p>
+<p>Producers SHOULD NOT introduce bare JSON keys for this purpose, because JSON-LD processing
+drops an unmapped key, and with it the value, in most RO-Crate tooling.</p>
+<p>The <code>propertyID</code> IRIs here belong to the producer, under a namespace the producer controls.
+This profile deliberately does not enumerate them: that is the extension point which keeps
+domain-specific metadata independent of this profile's versioning.</p>
+<h2 id="terms-defined-by-this-profile">Terms defined by this profile</h2>
+<p>Three, all <code>DefinedTerm</code>, all referenced by <code>@id</code> only. They are defined in the
+<a href="../0.2/ro-crate-metadata.json">Profile Crate</a> and, per the
+<a href="https://www.researchobject.org/ro-crate/specification/1.2/profiles.html">profiles specification</a>,
+need not be repeated in each conforming crate.</p>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Used as</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://w3id.org/quilt/ro-crate#packageName"><code>packageName</code></a></td>
+<td><code>propertyID</code></td>
+<td>Fully qualified package name, <code>namespace/name</code></td>
+</tr>
+<tr>
+<td><a href="https://w3id.org/quilt/ro-crate#packageNamespace"><code>packageNamespace</code></a></td>
+<td><code>propertyID</code></td>
+<td>Namespace only; name derived from the root entity's <code>name</code></td>
+</tr>
+<tr>
+<td><a href="https://w3id.org/quilt/ro-crate#ELNEntry"><code>ELNEntry</code></a></td>
+<td><code>additionalType</code></td>
+<td>Marks a <code>CreativeWork</code> as an electronic lab notebook entry</td>
+</tr>
+</tbody>
+</table>
+<p>Term IRIs are intentionally unversioned while the profile URI is versioned, so that terms
+remain stable across profile revisions.</p>
+<h2 id="consumer-requirements">Consumer requirements</h2>
+<p>A conforming consumer is one that builds a package from a crate.</p>
+<p><strong>Manifest.</strong> The consumer MUST package exactly the entities listed in the root entity's
+<code>hasPart</code>, expanding each directory member — one typed <code>Dataset</code> or with an <code>@id</code> ending in
+<code>/</code> — to the objects beneath it, and leaving out <code>http://</code> and <code>https://</code> members. It MUST NOT substitute a directory listing when a crate
+is present.</p>
+<p><strong>Package naming.</strong> Resolution order MUST be: an explicit <code>packageName</code>; otherwise
+<code>packageNamespace</code> joined to the root entity's <code>name</code>; otherwise the consumer's own
+default. An invalid explicit name or namespace MUST be rejected rather than corrected.</p>
+<p>When joining a <code>packageNamespace</code> to the root's <code>name</code>, the consumer MUST replace each
+character other than a letter, digit, <code>_</code> or <code>-</code> with <code>-</code>, so <code>Assay A/B</code> becomes
+<code>Assay-A-B</code>. If the root has no <code>name</code>, or nothing but <code>-</code> remains, the consumer MUST use
+the name part of its own default.</p>
+<p><strong>Entry metadata.</strong> For each <code>File</code>, the consumer SHOULD attach the entity's remaining
+properties — everything except <code>@id</code>, <code>@type</code> and <code>name</code> — as metadata on the corresponding
+package entry, so that instrument timestamps and checksums survive into the package.</p>
+<p><strong>Package metadata.</strong> The consumer SHOULD derive a flat projection for search, keyed by the
+role an entity plays rather than by its <code>@type</code>, and reading each role as the
+<a href="#producer-recommendations">recommendations</a> describe:</p>
+<pre><code class="language-json">{
+  &quot;package_name&quot;: &quot;my-namespace/2026-09-08-assay-01&quot;,
+  &quot;creator&quot;:       [&quot;Jane Doe&quot;],
+  &quot;producer&quot;:      [&quot;Assay Development&quot;, &quot;Laboratory Operations&quot;],
+  &quot;instrument&quot;:    [&quot;Flow Cytometer 1&quot;],
+  &quot;instrument_id&quot;: [&quot;INST-000123&quot;],
+  &quot;eln_entry&quot;:     [&quot;ASSAY-1234&quot;]
+}
+</code></pre>
+<p>Keying by role rather than type is what makes this stable. Two entities of the same type —
+a parent and child organization, say — are distinguished by the property that links them to
+the root, not by inventing compound keys from their identifiers. Values stay
+human-readable, because a scientist searches for a group or instrument name, not for a key.
+A role the crate does not express is omitted. The consumer SHOULD read an entity written
+inline the same as one referenced by <code>@id</code>.</p>
+<p><strong>Provenance.</strong> The consumer MUST include <code>ro-crate-metadata.json</code> in the package, so the
+package records, verbatim, the graph it was built from.</p>
+<p><strong>Rejection.</strong> The consumer MUST reject a crate it cannot package as written — a <code>hasPart</code>
+member it cannot resolve, two members that map to one logical key, an invalid or
+conflicting explicit name, two different entities with one <code>@id</code> — rather than package
+part of it. It MUST NOT reject a crate for departing
+from a recommendation, and declaring conformance to this profile does not change how a
+crate is processed. It SHOULD decode a UTF-8 byte-order mark rather than fail on one.</p>
+<h2 id="validation">Validation</h2>
+<p><a href="../validate.py"><code>validate.py</code></a> in this repository checks the Profile Crate and its example:
+JSON-LD expansion against the published RO-Crate context with no term dropped, the Profile
+Crate's structural requirements, resource descriptors and their roles, term definitions
+agreeing with the term set in both directions, and the example declaring conformance back to
+the profile.</p>
+<p>It does not check arbitrary crates against the requirements above; no SHACL shape exists
+yet. <a href="https://github.com/crs4/rocrate-validator"><code>roc-validator</code></a> covers the base
+specification layer.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.researchobject.org/ro-crate/specification/1.3/">RO-Crate 1.3 specification</a></li>
+<li><a href="https://www.researchobject.org/ro-crate/specification/1.2/profiles.html">RO-Crate profiles</a>
+  and the <a href="https://profiles.ro-crate.org/">profiles registry</a></li>
+<li><a href="https://www.researchobject.org/ro-crate/specification/1.3/appendix/jsonld.html#extending-ro-crate">Extending RO-Crate</a></li>
+<li><a href="https://www.researchobject.org/workflow-run-crate/profiles/process_run_crate/">Process Run Crate</a></li>
+<li><a href="https://github.com/TheELNConsortium/TheELNFileFormat">ELN file format specification</a></li>
+<li><a href="https://schema.org/">schema.org</a></li>
+<li><a href="https://docs.quiltdata.com/">Quilt documentation</a> and
+  <a href="https://github.com/quiltdata/quilt">quiltdata/quilt</a></li>
+</ul>
+<h2 id="license">License</h2>
+<p>This specification is licensed under the <a href="../LICENSE">Apache License 2.0</a>.</p><h2 id="term-definitions">Term definitions</h2>
+<dl>
+<dt id="packageName"><dfn>packageName</dfn></dt>
+<dd>Identifies a <code>PropertyValue</code> whose value is the fully qualified name of the
+Quilt package to build, in the form <code>namespace/name</code>. Used as the value of
+<code>propertyID</code>. Takes precedence over <code>packageNamespace</code>.</dd>
+<dt id="packageNamespace"><dfn>packageNamespace</dfn></dt>
+<dd>Identifies a <code>PropertyValue</code> whose value is the namespace portion only of
+the Quilt package name. The name portion is derived from the <code>name</code> of the root
+data entity. Used as the value of <code>propertyID</code>.</dd>
+<dt id="ELNEntry"><dfn>ELNEntry</dfn></dt>
+<dd>An entry in an electronic lab notebook that documents the experiment a crate records.
+Used as the value of <code>additionalType</code> on a <code>CreativeWork</code>. The
+notebook system is identified by <code>provider</code>, which keeps the term independent of
+any one vendor.</dd>
+</dl>
+</body>
+</html>

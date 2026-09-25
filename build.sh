@@ -22,7 +22,7 @@
 set -e
 cd "$(dirname "$0")"
 
-VERSION="${1:-0.1}"
+VERSION="${1:-0.2}"
 [ -d "$VERSION" ] || { echo "no such version directory: $VERSION" >&2; exit 1; }
 
 {
