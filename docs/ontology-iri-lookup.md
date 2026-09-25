@@ -85,7 +85,7 @@ under-specifying is merely less useful.
 
 - Use the `http://purl.obolibrary.org/obo/OBI_nnnnnnn` form. Note `http`, not `https`, and
   an underscore, not a colon — that is the canonical IRI. `OBI:0400044` is the CURIE display
-  form and MUST NOT appear in a crate.
+  form; in a crate it is not an IRI, so tools cannot resolve it.
 - `additionalType` takes a reference object, `{"@id": "http://purl.obolibrary.org/obo/..."}`,
   not a bare string.
 - A contextual entity for the term is OPTIONAL, but helps anyone reading the crate:

@@ -62,19 +62,19 @@ drift. Changing a redirect target means another pull request there.
 
 ## Complying with the profile
 
-**If you produce crates**, work through the producer requirements in
-[`spec/profile.md`](spec/profile.md) and compare against
-[`0.1/example1/ro-crate-metadata.json`](0.1/example1/ro-crate-metadata.json), which is a
-complete conforming crate. The short version: declare `conformsTo` on the root entity, list
-every file in `hasPart`, give people absolute identifiers, record acquisition as a
-`CreateAction` reachable from `mentions`, and express anything domain-specific with
-`variableMeasured` rather than inventing JSON keys.
+**If you produce crates**, only two things are required: list every file to package in the
+root entity's `hasPart`, and, if you name the package, give a valid name. Everything else in
+[`spec/profile.md`](spec/profile.md) is a recommendation. Follow it and a consumer can index
+the crate's people, instrument and notebook entry for search; depart from it and the crate
+is still packaged. Compare against
+[`0.1/example1/ro-crate-metadata.json`](0.1/example1/ro-crate-metadata.json), which follows
+every recommendation.
 
 **If you consume crates**, the consumer requirements are normative too. A conforming
 consumer packages exactly what `hasPart` lists, resolves the package name in a defined
-order, preserves the graph verbatim, keeps the instrument's timestamps on the package
-entries, and rejects rather than partially ingests a crate that claims conformance and fails
-it.
+order, preserves the graph verbatim, and keeps the instrument's timestamps on the package
+entries. It rejects a crate only when it cannot package it as written, and never for
+departing from a recommendation.
 
 A conforming crate needs **no `@context` extension**. All three profile terms are used in
 `propertyID` and `additionalType` positions, which take IRIs rather than introducing JSON-LD
