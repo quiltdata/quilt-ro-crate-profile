@@ -132,7 +132,9 @@ This mirrors how the base specification expresses a DOI: a `PropertyValue` under
   producer.
 - A crate MUST NOT give two different values for either term.
 - The root's `name` is a title written for people, so when it is joined to a
-  `packageNamespace` the consumer adapts it to the package-name grammar.
+  `packageNamespace` the consumer adapts it to the package-name grammar as the
+  [consumer requirements](#consumer-requirements) define. A producer that needs an exact
+  name gives `packageName` instead.
 
 ## Producer recommendations
 
@@ -328,13 +330,18 @@ remain stable across profile revisions.
 A conforming consumer is one that builds a package from a crate.
 
 **Manifest.** The consumer MUST package exactly the entities listed in the root entity's
-`hasPart`, expanding `Dataset` members to the objects beneath them and leaving out
-`http://` and `https://` members. It MUST NOT substitute a directory listing when a crate
+`hasPart`, expanding each directory member — one typed `Dataset` or with an `@id` ending in
+`/` — to the objects beneath it, and leaving out `http://` and `https://` members. It MUST NOT substitute a directory listing when a crate
 is present.
 
 **Package naming.** Resolution order MUST be: an explicit `packageName`; otherwise
 `packageNamespace` joined to the root entity's `name`; otherwise the consumer's own
 default. An invalid explicit name or namespace MUST be rejected rather than corrected.
+
+When joining a `packageNamespace` to the root's `name`, the consumer MUST replace each
+character other than a letter, digit, `_` or `-` with `-`, so `Assay A/B` becomes
+`Assay-A-B`. If the root has no `name`, or nothing but `-` remains, the consumer MUST use
+the name part of its own default.
 
 **Entry metadata.** For each `File`, the consumer SHOULD attach the entity's remaining
 properties — everything except `@id`, `@type` and `name` — as metadata on the corresponding

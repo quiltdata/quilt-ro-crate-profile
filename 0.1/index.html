@@ -154,7 +154,9 @@ root data entity carries one of the following under <code>identifier</code>.</p>
   producer.</li>
 <li>A crate MUST NOT give two different values for either term.</li>
 <li>The root's <code>name</code> is a title written for people, so when it is joined to a
-  <code>packageNamespace</code> the consumer adapts it to the package-name grammar.</li>
+  <code>packageNamespace</code> the consumer adapts it to the package-name grammar as the
+  <a href="#consumer-requirements">consumer requirements</a> define. A producer that needs an exact
+  name gives <code>packageName</code> instead.</li>
 </ul>
 <h2 id="producer-recommendations">Producer recommendations</h2>
 <p>Each recommendation below says what a consumer reads from it. A crate that departs from one
@@ -337,12 +339,16 @@ remain stable across profile revisions.</p>
 <h2 id="consumer-requirements">Consumer requirements</h2>
 <p>A conforming consumer is one that builds a package from a crate.</p>
 <p><strong>Manifest.</strong> The consumer MUST package exactly the entities listed in the root entity's
-<code>hasPart</code>, expanding <code>Dataset</code> members to the objects beneath them and leaving out
-<code>http://</code> and <code>https://</code> members. It MUST NOT substitute a directory listing when a crate
+<code>hasPart</code>, expanding each directory member — one typed <code>Dataset</code> or with an <code>@id</code> ending in
+<code>/</code> — to the objects beneath it, and leaving out <code>http://</code> and <code>https://</code> members. It MUST NOT substitute a directory listing when a crate
 is present.</p>
 <p><strong>Package naming.</strong> Resolution order MUST be: an explicit <code>packageName</code>; otherwise
 <code>packageNamespace</code> joined to the root entity's <code>name</code>; otherwise the consumer's own
 default. An invalid explicit name or namespace MUST be rejected rather than corrected.</p>
+<p>When joining a <code>packageNamespace</code> to the root's <code>name</code>, the consumer MUST replace each
+character other than a letter, digit, <code>_</code> or <code>-</code> with <code>-</code>, so <code>Assay A/B</code> becomes
+<code>Assay-A-B</code>. If the root has no <code>name</code>, or nothing but <code>-</code> remains, the consumer MUST use
+the name part of its own default.</p>
 <p><strong>Entry metadata.</strong> For each <code>File</code>, the consumer SHOULD attach the entity's remaining
 properties — everything except <code>@id</code>, <code>@type</code> and <code>name</code> — as metadata on the corresponding
 package entry, so that instrument timestamps and checksums survive into the package.</p>
