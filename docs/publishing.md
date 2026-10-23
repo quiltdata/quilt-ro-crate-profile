@@ -140,18 +140,20 @@ term IRIs resolve but land nowhere useful.
 - Release [quiltdata/quilt-ro-crate-profile#5](https://github.com/quiltdata/quilt-ro-crate-profile/pull/5)
   is merged. Live 0.3 HTML, JSON and JSON-LD artifacts return 200, have the expected media
   types and match the committed release bytes. The versioned w3id URI already resolves.
-- [perma-id/w3id.org#6964](https://github.com/perma-id/w3id.org/pull/6964) proposes moving
-  the unversioned URI from 0.2 to 0.3. `w3id/` matches this submission. Tested with Apache
-  2.4.67: all 13 redirect/content-negotiation cases passed, including older versioned URIs.
-  Until upstream merges it, the live unversioned URI continues to serve 0.2.
+- [perma-id/w3id.org#6964](https://github.com/perma-id/w3id.org/pull/6964) merged October 23,
+  moving the unversioned URI from 0.2 to 0.3. Verified live HTML and JSON-LD responses
+  return 200 with the expected media types and bytes identical to the 0.3 release.
+  Versioned 0.1, 0.2 and 0.3 JSON-LD responses still match their committed artifacts.
+  `w3id/` matches the merged rules. The submission also passed all 13 local Apache 2.4.67
+  redirect/content-negotiation cases.
 - The registry's 0.1/0.2 submission
   [#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61) merged October 21.
   Version 0.3 is submitted separately as
   [#67](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/67), retaining older
   entries. Its live URI passes the registry's content-type and RDF `prof:Profile` checks.
 
-The upstream submissions await maintainer review. After they merge, verify the unversioned
-URI with both HTML and JSON-LD Accept headers and confirm 0.3 appears in the registry.
+Only the 0.3 registry submission remains pending maintainer review. After it merges, confirm
+0.3 appears in the registry.
 
 ## Sequence
 

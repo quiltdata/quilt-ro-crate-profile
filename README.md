@@ -6,7 +6,7 @@ ingested into [Quilt](https://docs.quiltdata.com/) packages.
 **Status: draft, version 0.3.0.** The 0.3 release artifacts are in [`0.3/`](0.3/).
 The versioned URI <https://w3id.org/quilt/ro-crate/0.3> is published and resolving through
 GitHub Pages. The unversioned
-<https://w3id.org/quilt/ro-crate> currently points to 0.2, pinned by the w3id redirect rules.
+<https://w3id.org/quilt/ro-crate> now resolves to 0.3 with HTML/JSON-LD content negotiation.
 
 Instruments and acquisition software increasingly write an `ro-crate-metadata.json`
 alongside their output. That graph already records which files were produced, by whom, on
@@ -38,8 +38,8 @@ packaging system can read the crate directly instead of requiring a separate man
   contextual parent link and an upstream MD5 checksum without adding JSON-LD keys.
 
 Producers should declare the versioned `https://w3id.org/quilt/ro-crate/0.3` in root
-`conformsTo`. The unversioned URI still points to 0.2. The spec includes explicit examples
-of collisions between relative and absolute members.
+`conformsTo` to identify the exact rules, even though the unversioned URI now also resolves
+to 0.3. The spec includes explicit examples of collisions between relative and absolute members.
 
 **External validator compatibility:** `roc-validator` 0.13.0 accepts the S3 root but
 rejects relative member IDs in detached mode, including with `--metadata-only`. The
@@ -98,7 +98,7 @@ validate.py                structural checks; exits non-zero on failure
 `w3id/` is kept byte-identical to `ids/quilt/` as most recently submitted upstream —
 [perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), then
 [#6751](https://github.com/perma-id/w3id.org/pull/6751) for 0.2, and
-[#6964](https://github.com/perma-id/w3id.org/pull/6964) for 0.3 (submitted, awaiting merge).
+[#6964](https://github.com/perma-id/w3id.org/pull/6964) for 0.3 (merged October 23, 2026).
 Changing a redirect target means another pull request there.
 
 ## Complying with the profile
@@ -167,9 +167,10 @@ Current state:
   [#2](https://github.com/quiltdata/quilt-ro-crate-profile/pull/2).
 - [x] Publish 0.3: [#5](https://github.com/quiltdata/quilt-ro-crate-profile/pull/5) merged;
   verified Pages serves `/0.3/` and its JSON/JSON-LD artifacts, and the versioned w3id URI resolves.
-- [ ] Repoint the unversioned URI from 0.2 to 0.3: submitted as
-  [perma-id/w3id.org#6964](https://github.com/perma-id/w3id.org/pull/6964), awaiting merge.
-  `w3id/` matches that submission; the live unversioned URI still points to 0.2.
+- [x] Unversioned URI moved from 0.2 to 0.3:
+  [perma-id/w3id.org#6964](https://github.com/perma-id/w3id.org/pull/6964) merged October 23, 2026.
+  Verified live HTML and JSON-LD responses match the 0.3 release bytes. `w3id/` matches
+  the merged rules; versioned 0.1 and 0.2 URIs still resolve to their frozen releases.
 - [x] Registry submission for 0.1 and 0.2 merged:
   [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61),
   merged October 21, 2026.
