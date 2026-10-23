@@ -57,9 +57,10 @@ build.sh                   regenerates index.html and the .jsonld alias
 validate.py                structural checks; exits non-zero on failure
 ```
 
-`w3id/` is kept byte-identical to the files in
-[perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749) so the two cannot
-drift. Changing a redirect target means another pull request there.
+`w3id/` is kept byte-identical to `ids/quilt/` as most recently submitted upstream —
+[perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), then
+[#6751](https://github.com/perma-id/w3id.org/pull/6751) for 0.2 — so the two cannot drift.
+Changing a redirect target means another pull request there.
 
 ## Complying with the profile
 
@@ -120,10 +121,12 @@ Current state:
 
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
 - [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
-- [ ] Unversioned URI moved from 0.1 to 0.2. `/0.2` resolves as soon as Pages serves it, but
-  the unversioned URI is pinned in the w3id rules, so it needs a w3id pull request once 0.2
-  is live. `w3id/` is updated with that pull request, not before.
-- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): submitted as
+- [x] `https://w3id.org/quilt/ro-crate/0.2` resolving (versioned rules route any `MAJOR.MINOR`)
+- [ ] Unversioned URI moved from 0.1 to 0.2: submitted as
+  [perma-id/w3id.org#6751](https://github.com/perma-id/w3id.org/pull/6751), awaiting merge.
+  `w3id/` matches that submission.
+- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): 0.1 and 0.2
+  submitted as
   [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting review
 - [ ] SHACL shape added under the `validation` role
 - [x] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
