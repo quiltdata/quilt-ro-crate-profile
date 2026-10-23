@@ -4,8 +4,8 @@ An [RO-Crate](https://www.researchobject.org/ro-crate/) profile for crates that 
 ingested into [Quilt](https://docs.quiltdata.com/) packages.
 
 **Status: draft, version 0.3.0.** The 0.3 release artifacts are in [`0.3/`](0.3/).
-The versioned URI is `https://w3id.org/quilt/ro-crate/0.3`; it becomes available when this
-release is merged and GitHub Pages publishes it. The unversioned
+The versioned URI <https://w3id.org/quilt/ro-crate/0.3> is published and resolving through
+GitHub Pages. The unversioned
 <https://w3id.org/quilt/ro-crate> currently points to 0.2, pinned by the w3id redirect rules.
 
 Instruments and acquisition software increasingly write an `ro-crate-metadata.json`
@@ -97,7 +97,8 @@ validate.py                structural checks; exits non-zero on failure
 
 `w3id/` is kept byte-identical to `ids/quilt/` as most recently submitted upstream —
 [perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), then
-[#6751](https://github.com/perma-id/w3id.org/pull/6751) for 0.2 — so the two cannot drift.
+[#6751](https://github.com/perma-id/w3id.org/pull/6751) for 0.2, and
+[#6964](https://github.com/perma-id/w3id.org/pull/6964) for 0.3 (submitted, awaiting merge).
 Changing a redirect target means another pull request there.
 
 ## Complying with the profile
@@ -164,23 +165,27 @@ Current state:
 - [x] Unversioned URI moved to 0.2: [perma-id/w3id.org#6751](https://github.com/perma-id/w3id.org/pull/6751)
   merged September 25, 2026. `w3id/` matches the merged rules, synchronized in
   [#2](https://github.com/quiltdata/quilt-ro-crate-profile/pull/2).
-- [ ] Publish 0.3 by merging the release PR and verifying Pages serves `/0.3/` and its JSON/JSON-LD artifacts.
-- [ ] Repoint the unversioned URI from 0.2 to 0.3 after Pages publishes it, via a new
-  w3id pull request. Update `w3id/` with that submission.
-- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): 0.1 and 0.2
-  submitted as
-  [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting review
-- [ ] Add the 0.3 versioned URI to the profiles registry after publishing.
+- [x] Publish 0.3: [#5](https://github.com/quiltdata/quilt-ro-crate-profile/pull/5) merged;
+  verified Pages serves `/0.3/` and its JSON/JSON-LD artifacts, and the versioned w3id URI resolves.
+- [ ] Repoint the unversioned URI from 0.2 to 0.3: submitted as
+  [perma-id/w3id.org#6964](https://github.com/perma-id/w3id.org/pull/6964), awaiting merge.
+  `w3id/` matches that submission; the live unversioned URI still points to 0.2.
+- [x] Registry submission for 0.1 and 0.2 merged:
+  [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61),
+  merged October 21, 2026.
+- [ ] Add 0.3 to the registry: submitted as
+  [eScienceLab/RO-Crate-Profile-Portal#67](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/67),
+  awaiting merge. The versioned URI passes the registry content-type and RDF Profile checks.
 - [ ] SHACL shape added under the `validation` role
 - [x] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
 
-Pages serves the content types the w3id rules depend on. Verified against the live site:
+Pages serves the content types the w3id rules depend on. Verified for 0.3 on October 23, 2026:
 
 | URL | Content-Type |
 |---|---|
-| [`/0.1/`](https://quiltdata.github.io/quilt-ro-crate-profile/0.1/) | `text/html; charset=utf-8` |
-| [`/0.1/ro-crate-metadata.json`](https://quiltdata.github.io/quilt-ro-crate-profile/0.1/ro-crate-metadata.json) | `application/json; charset=utf-8` |
-| [`/0.1/ro-crate-metadata.jsonld`](https://quiltdata.github.io/quilt-ro-crate-profile/0.1/ro-crate-metadata.jsonld) | `application/ld+json` |
+| [`/0.3/`](https://quiltdata.github.io/quilt-ro-crate-profile/0.3/) | `text/html; charset=utf-8` |
+| [`/0.3/ro-crate-metadata.json`](https://quiltdata.github.io/quilt-ro-crate-profile/0.3/ro-crate-metadata.json) | `application/json; charset=utf-8` |
+| [`/0.3/ro-crate-metadata.jsonld`](https://quiltdata.github.io/quilt-ro-crate-profile/0.3/ro-crate-metadata.jsonld) | `application/ld+json` |
 
 This is why the `.jsonld` alias exists, and why the w3id rules negotiate to it rather than to
 the `.json` the RO-Crate specification requires as a filename.
