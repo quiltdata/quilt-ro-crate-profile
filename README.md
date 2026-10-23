@@ -6,7 +6,7 @@ ingested into [Quilt](https://docs.quiltdata.com/) packages.
 **Status: draft, version 0.3.0.** The 0.3 release artifacts are in [`0.3/`](0.3/).
 The versioned URI is `https://w3id.org/quilt/ro-crate/0.3`; it becomes available when this
 release is merged and GitHub Pages publishes it. The unversioned
-<https://w3id.org/quilt/ro-crate> is separately pinned by the w3id redirect rules.
+<https://w3id.org/quilt/ro-crate> currently points to 0.2, pinned by the w3id redirect rules.
 
 Instruments and acquisition software increasingly write an `ro-crate-metadata.json`
 alongside their output. That graph already records which files were produced, by whom, on
@@ -84,9 +84,10 @@ build.sh                   regenerates index.html and the .jsonld alias
 validate.py                structural checks; exits non-zero on failure
 ```
 
-`w3id/` is kept byte-identical to the files in
-[perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749) so the two cannot
-drift. Changing a redirect target means another pull request there.
+`w3id/` is kept byte-identical to `ids/quilt/` as most recently submitted upstream —
+[perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), then
+[#6751](https://github.com/perma-id/w3id.org/pull/6751) for 0.2 — so the two cannot drift.
+Changing a redirect target means another pull request there.
 
 ## Complying with the profile
 
@@ -148,11 +149,15 @@ Current state:
 
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
 - [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
+- [x] `https://w3id.org/quilt/ro-crate/0.2` resolving (versioned rules route any `MAJOR.MINOR`)
+- [x] Unversioned URI moved to 0.2: [perma-id/w3id.org#6751](https://github.com/perma-id/w3id.org/pull/6751)
+  merged September 25, 2026. `w3id/` matches the merged rules, synchronized in
+  [#2](https://github.com/quiltdata/quilt-ro-crate-profile/pull/2).
 - [ ] Publish 0.3 by merging the release PR and verifying Pages serves `/0.3/` and its JSON/JSON-LD artifacts.
-- [ ] Repoint the unversioned URI to 0.3 after Pages publishes it. The earlier 0.2
-  submission is tracked in [#2](https://github.com/quiltdata/quilt-ro-crate-profile/pull/2);
-  a w3id pull request is needed for 0.3. Update `w3id/` with that submission.
-- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): submitted as
+- [ ] Repoint the unversioned URI from 0.2 to 0.3 after Pages publishes it, via a new
+  w3id pull request. Update `w3id/` with that submission.
+- [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): 0.1 and 0.2
+  submitted as
   [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting review
 - [ ] Add the 0.3 versioned URI to the profiles registry after publishing.
 - [ ] SHACL shape added under the `validation` role
