@@ -163,7 +163,7 @@ Current state:
 - [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
 - [x] `https://w3id.org/quilt/ro-crate/0.2` resolving (versioned rules route any `MAJOR.MINOR`)
 - [x] Unversioned URI moved to 0.2: [perma-id/w3id.org#6751](https://github.com/perma-id/w3id.org/pull/6751)
-  merged September 25, 2026. `w3id/` matches the merged rules, synchronized in
+  merged September 25, 2026. The local snapshot was synchronized in
   [#2](https://github.com/quiltdata/quilt-ro-crate-profile/pull/2).
 - [x] Publish 0.3: [#5](https://github.com/quiltdata/quilt-ro-crate-profile/pull/5) merged;
   verified Pages serves `/0.3/` and its JSON/JSON-LD artifacts, and the versioned w3id URI resolves.
