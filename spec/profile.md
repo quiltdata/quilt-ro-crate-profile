@@ -1,6 +1,6 @@
 # Quilt RO-Crate profile
 
-Version 0.2.0 — 2026-09-25 — **draft**
+Version 0.3.0 — 2026-10-23 — **draft**
 
 An [RO-Crate](https://www.researchobject.org/ro-crate/) profile for crates that are
 ingested into [Quilt](https://docs.quiltdata.com/) packages.
@@ -8,8 +8,8 @@ ingested into [Quilt](https://docs.quiltdata.com/) packages.
 | | |
 |---|---|
 | Profile URI | <https://w3id.org/quilt/ro-crate> |
-| This version | `https://w3id.org/quilt/ro-crate/0.2` |
-| Previous version | [`https://w3id.org/quilt/ro-crate/0.1`](https://w3id.org/quilt/ro-crate/0.1) |
+| This version | `https://w3id.org/quilt/ro-crate/0.3` |
+| Previous version | [`https://w3id.org/quilt/ro-crate/0.2`](https://w3id.org/quilt/ro-crate/0.2) |
 | Term namespace | `https://w3id.org/quilt/ro-crate#` |
 | `isProfileOf` | [RO-Crate 1.2](https://w3id.org/ro/crate/1.2) minimum; [1.3](https://w3id.org/ro/crate/1.3) permitted |
 | Recommended companion | [Process Run Crate 0.6](https://w3id.org/ro/wfrun/process/0.6) |
@@ -85,10 +85,14 @@ product cannot generalize to a second product. A typed entity with a `provider` 
 - The root data entity MUST declare a non-empty `hasPart` listing every file or directory
   to be packaged. This list is the manifest.
 - A relative `@id` in `hasPart` resolves against the folder holding
-  `ro-crate-metadata.json` and MUST stay inside it: no `.` or `..` segments, no empty
-  segments, no leading `/`. Being a URI reference, it is percent-decoded, so a `?` or `#`
-  that belongs to the key MUST be percent-encoded. An absolute `s3://` `@id` may name an object anywhere; its
-  basename becomes the package logical key.
+  `ro-crate-metadata.json`, unless the root data entity's `@id` is an absolute `s3://`
+  URI ending in `/`; in that case it resolves against that S3 prefix instead. The root
+  is the entity referenced by the metadata descriptor's `about`, not necessarily `./`.
+  A relative member MUST stay inside the selected base: no `.` or `..` segments, no empty
+  segments (apart from a directory's trailing `/`), no leading `/`. These constraints
+  apply after percent-decoding as well. Being a URI reference, it is percent-decoded,
+  so a `?` or `#` that belongs to the key MUST be percent-encoded. An absolute `s3://`
+  `@id` may name an object anywhere; its basename becomes the package logical key.
 - A directory MUST be typed `Dataset` or have an `@id` ending in `/`. It expands to every
   object beneath that prefix.
 - An `http://` or `https://` member is a reference to something on the web rather than an
@@ -100,6 +104,40 @@ product cannot generalize to a second product. A typed entity with a `provider` 
   name the same object; the file keeps its entry metadata.
 - Two entities MUST NOT share an `@id` with different content. A verbatim repeat, which some
   emitters produce, is treated as one entity.
+
+An S3 root used as a base MUST name a bucket, end in `/`, and have no query or fragment.
+The prefix after the bucket delimiter MUST obey the same segment and percent-encoding
+constraints as relative members; an empty prefix (the bucket root) is allowed.
+Relative members retain their relative paths as package logical keys; selecting an S3
+base does not turn them into basename-only keys. Absolute S3 members keep the existing
+basename rule. All other root identifiers leave the metadata-folder base unchanged.
+`isPartOf` does not select a base.
+
+A relative member `A1.fcs` and an absolute member `s3://other-bucket/run/A1.fcs`
+both map to logical key `A1.fcs`. If they name different objects, the consumer MUST reject
+the crate. By contrast, relative `wells/A1.fcs` maps to `wells/A1.fcs` and does not collide
+with that absolute member's `A1.fcs`. The same rule applies to collisions discovered
+while expanding directories.
+
+For example, a metadata document stored at
+`s3://manifests/crates/assay/ro-crate-metadata.json` can describe data in a read-only bucket:
+
+```json
+{
+  "@id": "s3://source-data/acquisitions/run-01/",
+  "@type": "Dataset",
+  "hasPart": [{ "@id": "wells/A1.fcs" }, { "@id": "images/" }]
+}
+```
+
+The descriptor's `about` references `s3://source-data/acquisitions/run-01/`.
+`wells/A1.fcs` resolves to `s3://source-data/acquisitions/run-01/wells/A1.fcs` and keeps
+its logical key `wells/A1.fcs`. `images/` expands beneath the same S3 base, keeping the
+`images/` path in its logical keys. The metadata document is still packaged from its
+actual location. This is a packaging resolution rule; it does not change JSON-LD's
+document base or rewrite entity identifiers in the preserved graph. See the complete
+[detached example](../0.3/example2/ro-crate-metadata.json) and RO-Crate's
+[root identifier guidance](https://www.researchobject.org/ro-crate/specification/1.2/root-data-entity.html#root-data-entity-identifier).
 
 ### Package naming
 
@@ -166,11 +204,40 @@ requires `name`, `description`, `datePublished` and `license` on the root data e
 profile adds nothing to those requirements and does not enforce them. In addition, the root
 data entity:
 
-- SHOULD declare `conformsTo` including `{"@id": "https://w3id.org/quilt/ro-crate"}`, with a
+- SHOULD declare `conformsTo` including `{"@id": "https://w3id.org/quilt/ro-crate/0.3"}`, with a
   corresponding contextual entity typed `["CreativeWork", "Profile"]`. This tells readers and
   tools which conventions the crate follows; it does not change how a consumer processes it.
+  Use the versioned URI to identify the exact rules, especially while the unversioned URI
+  still resolves to 0.2. The unversioned URI MAY be declared in addition.
 - SHOULD declare `creator`, `producer`, `mentions` and `subjectOf`, which are what a consumer
   reads for search metadata, as described below. `keywords` is also RECOMMENDED.
+
+### Parent datasets
+
+A leaf crate SHOULD link to its containing collection using root `isPartOf`. To describe
+the parent as context without including its contents in the manifest, use a fragment
+identifier for a contextual `CreativeWork` and put the parent's location in `url`:
+
+```json
+{
+  "@id": "#parent-dataset",
+  "@type": "CreativeWork",
+  "name": "Acquisition collection",
+  "url": "s3://source-data/acquisitions/"
+}
+```
+
+The root references it with `"isPartOf": { "@id": "#parent-dataset" }`. The fragment
+identifies the description of the parent collection; `url` records its external location.
+Using `CreativeWork` describes the collection as context without asserting that its
+contents are payload Data Entities. An absolute-URI `Dataset` is a Data Entity and must
+be reachable through `hasPart`. RO-Crate's
+[Data Entity rules](https://www.researchobject.org/ro-crate/specification/1.2/data-entities.html)
+also allow fragment-identified contextual `Dataset`s, but `roc-validator` 0.13.0 still
+reports root-linkage failures for that form. Use the `CreativeWork` pattern for compatibility.
+Do not add the parent to `hasPart` merely to satisfy that check: under this profile it
+would request packaging the parent's contents. Neither `isPartOf` nor the parent's `url`
+changes the packaging base. See the [detached example](../0.3/example2/ro-crate-metadata.json).
 
 ### File entities
 
@@ -182,6 +249,30 @@ Each `File` SHOULD carry `name`, `encodingFormat`, `contentSize`, `dateCreated`,
 the times the files were transferred or copied. Object stores overwrite filesystem
 timestamps on upload, so these properties are frequently the only surviving record of when
 an experiment actually ran. The two are often equal; that is expected and correct.
+
+#### Upstream checksums
+
+When a source supplies a checksum other than SHA-256, producers SHOULD retain its algorithm
+and value rather than put it in `sha256`. For example, a file can reference a `PropertyValue`
+under `identifier`:
+
+```json
+{
+  "@id": "#A1-md5",
+  "@type": "PropertyValue",
+  "propertyID": "https://example.org/terms#md5",
+  "name": "Upstream MD5 checksum",
+  "value": "d41d8cd98f00b204e9800998ecf8427e"
+}
+```
+
+The file references it with `"identifier": { "@id": "#A1-md5" }`. The example digest is
+illustrative; use the source's actual value and an algorithm identifier under a documented
+namespace the producer controls in place of `https://example.org/terms#md5`. This uses
+stock JSON-LD keys and introduces no profile term. The consumer preserves the file's
+`identifier` as entry metadata and the referenced checksum entity in the packaged graph.
+An upstream checksum does not assert that the consumer verified it. A consumer MAY compute
+SHA-256 separately; it MUST NOT label an MD5, ETag or other checksum as `sha256`.
 
 ### People and organizations
 
@@ -221,8 +312,10 @@ this profile is RECOMMENDED.
 
 ### Electronic lab notebook entry
 
-A consumer reads the `name` of each root `subjectOf` entity whose `additionalType` is
-`ELNEntry`.
+A consumer reads the `name`, `identifier`, `url` (falling back to an absolute HTTP(S)
+`@id`), and `provider` of each root `subjectOf` entity whose `additionalType` includes
+`https://w3id.org/quilt/ro-crate#ELNEntry`. The [package metadata projection](#consumer-requirements)
+defines the corresponding search keys.
 
 ```json
 {
@@ -232,14 +325,18 @@ A consumer reads the `name` of each root `subjectOf` entity whose `additionalTyp
   "name": "ASSAY-1234",
   "identifier": "etr_AbC123",
   "url": "https://eln.example.org/entries/etr_AbC123",
-  "provider": { "@id": "#eln-vendor" }
+  "provider": { "@id": "https://eln.example.org/" }
 }
 ```
 
 The `@id` SHOULD be the resolvable entry URL, which makes the identifier globally unique
-without reserving any identifier space per vendor. `provider` SHOULD reference an
-`Organization` or `SoftwareApplication` naming the notebook system, which is what lets one
-consumer tell several notebook systems apart.
+without reserving any identifier space per vendor. `name` SHOULD be the entry's display
+ID, and `identifier` SHOULD be its stable system-assigned ID (for example, `etr_AbC123`),
+rather than its title. `provider` SHOULD reference an `Organization` or
+`SoftwareApplication` naming the notebook system. The provider's `@id` SHOULD be the
+absolute URI of the notebook instance, so tenants using the same product can be told apart.
+The provider's `name` supplies a human-readable label. A missing identifier, URL or provider
+does not prevent packaging or projection of the fields that are present.
 
 ### Licensing
 
@@ -318,7 +415,7 @@ domain-specific metadata independent of this profile's versioning.
 ## Terms defined by this profile
 
 Three, all `DefinedTerm`, all referenced by `@id` only. They are defined in the
-[Profile Crate](../0.2/ro-crate-metadata.json) and, per the
+[Profile Crate](../0.3/ro-crate-metadata.json) and, per the
 [profiles specification](https://www.researchobject.org/ro-crate/specification/1.2/profiles.html),
 need not be repeated in each conforming crate.
 
@@ -338,7 +435,12 @@ A conforming consumer is one that builds a package from a crate.
 **Manifest.** The consumer MUST package exactly the entities listed in the root entity's
 `hasPart`, expanding each directory member — one typed `Dataset` or with an `@id` ending in
 `/` — to the objects beneath it, and leaving out `http://` and `https://` members. It MUST NOT substitute a directory listing when a crate
-is present.
+is present. The consumer MUST resolve relative members against the root data entity's
+absolute `s3://` `@id` when it ends in `/`, and otherwise against the metadata document's
+folder, following the [manifest rules](#manifest). It MUST retain relative paths as logical
+keys, including during directory expansion, and enforce the same containment and collision
+rules with either base. It MUST NOT silently fall back to the metadata folder when a
+member beneath a selected S3 base cannot be resolved.
 
 **Package naming.** Resolution order MUST be: an explicit `packageName`; otherwise
 `packageNamespace` joined to the root entity's `name`; otherwise the consumer's own
@@ -364,16 +466,44 @@ role an entity plays rather than by its `@type`, and reading each role as the
   "producer":      ["Assay Development", "Laboratory Operations"],
   "instrument":    ["Flow Cytometer 1"],
   "instrument_id": ["INST-000123"],
-  "eln_entry":     ["ASSAY-1234"]
+  "eln_entry":     ["ASSAY-1234"],
+  "eln_entry_id":  ["etr_AbC123"],
+  "eln_entry_url": ["https://eln.example.org/entries/etr_AbC123"],
+  "eln_entry_provider": ["Example ELN"],
+  "eln_entry_provider_id": ["https://eln.example.org/"]
 }
 ```
 
 Keying by role rather than type is what makes this stable. Two entities of the same type —
 a parent and child organization, say — are distinguished by the property that links them to
-the root, not by inventing compound keys from their identifiers. Values stay
-human-readable, because a scientist searches for a group or instrument name, not for a key.
+the root, not by inventing compound keys from their identifiers. Names stay human-readable;
+identifiers and URLs support joins with external systems.
 A role the crate does not express is omitted. The consumer SHOULD read an entity written
 inline the same as one referenced by `@id`.
+
+For every `ELNEntry` reached through root `subjectOf`, the consumer SHOULD project:
+
+| Key | Source |
+|---|---|
+| `eln_entry` | Entry `name`, retained for compatibility with 0.2 and display-ID lookups |
+| `eln_entry_id` | Entry `identifier`: strings, or the `value` of a referenced or inline `PropertyValue` |
+| `eln_entry_url` | Entry `url` (a string or `@id` reference); if absent, its absolute HTTP(S) `@id` |
+| `eln_entry_provider` | The `name` of the entry's referenced or inline `provider` |
+| `eln_entry_provider_id` | The provider's absolute `@id`; omit a relative or fragment-only ID |
+
+All five keys are arrays of distinct strings, including when there is only one entry.
+Consumers SHOULD collect all values when a source property is multi-valued, omit absent or
+empty values and omit keys with no values. They SHOULD NOT stringify objects, invent a
+provider or derive an entry ID from its URL. Missing fields do not suppress the other fields.
+The arrays are independent search facets, not positionally aligned records. When several
+entries are present, consumers needing entry-to-provider associations use the preserved
+crate graph. Match entry URLs, or entry IDs scoped to a provider instance, when a join must
+be unambiguous across notebook systems or tenants; display IDs alone need not be unique.
+
+These keys are the consumer's search projection, not new RO-Crate terms. No vendor-specific
+`experiment_id` key is required. Benchling webhook 0.20.0 added matching on `eln_entry`
+([PR #402](https://github.com/quiltdata/benchling-webhook/pull/402)); matching the new ID or
+URL fields requires corresponding integration support.
 
 **Provenance.** The consumer MUST include `ro-crate-metadata.json` in the package, so the
 package records, verbatim, the graph it was built from.
@@ -387,15 +517,21 @@ crate is processed. It SHOULD decode a UTF-8 byte-order mark rather than fail on
 
 ## Validation
 
-[`validate.py`](../validate.py) in this repository checks the Profile Crate and its example:
+[`validate.py`](../validate.py) in this repository checks the Profile Crate and its examples:
 JSON-LD expansion against the published RO-Crate context with no term dropped, the Profile
 Crate's structural requirements, resource descriptors and their roles, term definitions
-agreeing with the term set in both directions, and the example declaring conformance back to
+agreeing with the term set in both directions, and each example declaring conformance back to
 the profile.
 
 It does not check arbitrary crates against the requirements above; no SHACL shape exists
 yet. [`roc-validator`](https://github.com/crs4/rocrate-validator) covers the base
-specification layer.
+specification layer. With version 0.13.0, the 1.2 profile in metadata-only, detached mode
+accepts the S3 root in example2 but reports REQUIRED failures for its relative file and
+directory IDs. It does not apply this profile's S3-root packaging resolution rule.
+Example2 therefore does **not** pass that external validator unchanged. See
+[validator compatibility](../docs/validator-compatibility.md) for the tested command,
+results and the absolute-ID alternative. The local structural checks do not establish
+external-validator compatibility or implement S3 packaging.
 
 ## References
 

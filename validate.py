@@ -1,7 +1,7 @@
 """Structural validation for the Quilt RO-Crate profile.
 
-Checks the Profile Crate and its example against the RO-Crate requirements for profiles,
-and checks that the two agree with each other. Stands in for the SHACL shape that the
+Checks the Profile Crate and its examples against the RO-Crate requirements for profiles,
+and checks that they agree with each other. Stands in for the SHACL shape that the
 specification lists as not yet written.
 
     python3 -m venv .venv && .venv/bin/pip install pyld requests
@@ -13,10 +13,10 @@ ROCRATE_CONTEXT to a local file to run fully offline.
 Exits non-zero on any failure, so it is usable as a pre-publish gate or in CI.
 """
 
-import json, os, sys, urllib.request
+import glob, json, os, sys, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.2"
+VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.3"
 BASE = os.path.join(HERE, VERSION)
 CONTEXT_URL = "https://w3id.org/ro/crate/1.2/context"
 
@@ -59,8 +59,12 @@ def load(rel):
 
 
 fails = []
-for rel, kind in [("ro-crate-metadata.json", "Profile Crate"),
-                  ("example1/ro-crate-metadata.json", "conforming crate")]:
+examples = [os.path.relpath(p, BASE) for p in sorted(glob.glob(
+    os.path.join(BASE, "example*", "ro-crate-metadata.json")))]
+if not examples:
+    fails.append("no example crates found")
+for rel, kind in [("ro-crate-metadata.json", "Profile Crate")] + [
+        (rel, "conforming crate") for rel in examples]:
     doc = load(rel)
     g = doc["@graph"]
     keys, types = set(), set()
@@ -114,6 +118,22 @@ for rel, kind in [("ro-crate-metadata.json", "Profile Crate"),
             fails.append(f"{rel}: {n} {v}")
 
     if kind == "conforming crate":
+        profile_uri = f"https://w3id.org/quilt/ro-crate/{VERSION}"
+        conforms = root.get("conformsTo", [])
+        conforms = conforms if isinstance(conforms, list) else [conforms]
+        linked = profile_uri in {c["@id"] for c in conforms}
+        if not linked:
+            fails.append(f"{rel}: root does not reference {profile_uri}")
+        # Relative manifest IDs must resolve to described entities even when the
+        # descriptor points at an absolute S3 root rather than './'. No S3 reads:
+        # this validates example structure, not a consumer's packaging behavior.
+        parts = root.get("hasPart", [])
+        parts = parts if isinstance(parts, list) else [parts]
+        missing = [p["@id"] for p in parts if p["@id"] not in by]
+        print(f"    {'ok ' if linked else 'FAIL'} example declares this profile")
+        print(f"    {'ok ' if not missing else 'FAIL'} manifest entities described")
+        if missing:
+            fails.append(f"{rel}: manifest entities missing {missing}")
         # The base specification requires these on the root data entity.
         miss = [p for p in ("name", "description", "datePublished", "license")
                 if p not in root]
@@ -167,11 +187,13 @@ for rel, kind in [("ro-crate-metadata.json", "Profile Crate"),
         for t in declared:
             checks[f"{t.rsplit('#')[-1]} has termCode+description"] = (
                 "termCode" in by[t] and "description" in by[t])
-        ex = by["example1/"]
-        checks["example declares this profile"] = root["@id"] in {
-            c["@id"] for c in ex["conformsTo"]}
-        checks["example crate exists on disk"] = os.path.isfile(
-            os.path.join(BASE, "example1/ro-crate-metadata.json"))
+        for artifact in sorted(hp):
+            if artifact.startswith("example") and artifact.endswith("/"):
+                ex = by[artifact]
+                checks[f"{artifact} declares this profile"] = root["@id"] in {
+                    c["@id"] for c in ex["conformsTo"]}
+                checks[f"{artifact} crate exists on disk"] = os.path.isfile(
+                    os.path.join(BASE, artifact, "ro-crate-metadata.json"))
         print("  Profile Crate structural checks:")
         for k, v in checks.items():
             print(f"    {'ok ' if v else 'FAIL'} {k}")
@@ -213,7 +235,8 @@ def wu(o):
         used.add(o)
 
 
-wu(ex["@graph"])
+for example in examples:
+    wu(load(example)["@graph"])
 undef = sorted(used - defined)
 print(f"  profile terms used      : {sorted(used) or 'none'}")
 print(f"    {'ok ' if not undef else 'FAIL'} all defined in the Profile Crate"

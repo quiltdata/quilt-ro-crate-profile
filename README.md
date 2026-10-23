@@ -3,8 +3,10 @@
 An [RO-Crate](https://www.researchobject.org/ro-crate/) profile for crates that are
 ingested into [Quilt](https://docs.quiltdata.com/) packages.
 
-**Status: draft, version 0.1.0.** Published and resolvable at
-<https://w3id.org/quilt/ro-crate>.
+**Status: draft, version 0.3.0.** The 0.3 release artifacts are in [`0.3/`](0.3/).
+The versioned URI is `https://w3id.org/quilt/ro-crate/0.3`; it becomes available when this
+release is merged and GitHub Pages publishes it. The unversioned
+<https://w3id.org/quilt/ro-crate> currently points to 0.2, pinned by the w3id redirect rules.
 
 Instruments and acquisition software increasingly write an `ro-crate-metadata.json`
 alongside their output. That graph already records which files were produced, by whom, on
@@ -19,6 +21,39 @@ packaging system can read the crate directly instead of requiring a separate man
 
 **Read the specification: [`spec/profile.md`](spec/profile.md).**
 
+## Changes in 0.3
+
+- **ELN linking metadata ([#3](https://github.com/quiltdata/quilt-ro-crate-profile/issues/3)).**
+  Consumers should project `eln_entry_id`, `eln_entry_url`, `eln_entry_provider`, and
+  `eln_entry_provider_id`, alongside the existing array-valued `eln_entry` display ID.
+  Entry URLs and provider-scoped IDs enable joins across notebook systems and tenants.
+  The [specification](spec/profile.md#consumer-requirements) defines source fields,
+  fallbacks, missing values and multi-entry handling. The [full example](0.3/example1/ro-crate-metadata.json)
+  includes the entry and provider fields.
+- **Detached S3 crates ([#4](https://github.com/quiltdata/quilt-ro-crate-profile/issues/4)).**
+  An absolute S3 root `@id` ending in `/` supplies the base for relative `hasPart` IDs,
+  so metadata can live outside a read-only data bucket. Relative paths remain package
+  logical keys, and the existing containment and collision rules still apply. See the
+  [detached example](0.3/example2/ro-crate-metadata.json), which also demonstrates a
+  contextual parent link and an upstream MD5 checksum without adding JSON-LD keys.
+
+Producers should declare the versioned `https://w3id.org/quilt/ro-crate/0.3` in root
+`conformsTo`. The unversioned URI still points to 0.2. The spec includes explicit examples
+of collisions between relative and absolute members.
+
+**External validator compatibility:** `roc-validator` 0.13.0 accepts the S3 root but
+rejects relative member IDs in detached mode, including with `--metadata-only`. The
+committed detached example therefore fails its REQUIRED detached-member check. See
+[tested results and reproduction commands](docs/validator-compatibility.md), including
+an absolute-ID comparison that passes and its effect on package logical keys.
+
+These are profile changes. Packaging Engine support for the new fields and S3 base rule
+must be implemented separately; publishing this specification does not update consumers.
+Benchling webhook 0.20.0 already links by `eln_entry`
+([PR #402](https://github.com/quiltdata/benchling-webhook/pull/402)); using the new ID/URL
+keys for linking requires a further integration change. Published 0.1 and 0.2 artifacts
+remain frozen, and the three existing term IRIs are unchanged.
+
 ## The three artifacts
 
 A profile is three things, and RO-Crate 1.2 gives each a distinct job. Conflating them is
@@ -26,9 +61,9 @@ the usual mistake.
 
 | Artifact | Role | Here |
 |---|---|---|
-| Profile description | Human-readable spec. The profile URI MUST resolve to this | [`0.2/index.html`](0.2/index.html), generated from [`spec/profile.md`](spec/profile.md) |
-| Profile Crate | Machine-readable RO-Crate that *is* the profile. Defines the terms and names the artifacts and their roles | [`0.2/ro-crate-metadata.json`](0.2/ro-crate-metadata.json) |
-| Conforming crate | A crate that *uses* the profile, via `conformsTo` on its root | [`0.2/example1/ro-crate-metadata.json`](0.2/example1/ro-crate-metadata.json) |
+| Profile description | Human-readable spec. The profile URI MUST resolve to this | [`0.3/index.html`](0.3/index.html), generated from [`spec/profile.md`](spec/profile.md) |
+| Profile Crate | Machine-readable RO-Crate that *is* the profile. Defines the terms and names the artifacts and their roles | [`0.3/ro-crate-metadata.json`](0.3/ro-crate-metadata.json) |
+| Conforming crate | A crate that *uses* the profile, via `conformsTo` on its root | [`0.3/example1/ro-crate-metadata.json`](0.3/example1/ro-crate-metadata.json) |
 
 The Profile Crate is the one people skip, and skipping it has a concrete cost: the three
 terms this profile defines would be referenced by conforming crates and defined nowhere. The
@@ -41,12 +76,15 @@ exists.
 ```
 spec/profile.md            source of truth for the current version's specification
 0.1/                       a published version, frozen
-0.2/                       the current version
+0.2/                       a published version, frozen
+0.3/                       the current version
   index.html               generated specification        (role: specification)
   ro-crate-metadata.json   the Profile Crate
   ro-crate-metadata.jsonld content-type alias, generated
   example1/
     ro-crate-metadata.json conforming example              (role: example)
+  example2/
+    ro-crate-metadata.json detached S3 example             (role: example)
 docs/
   ontology-iri-lookup.md   how to find an instrument class IRI
   publishing.md            how a profile gets published, and why it takes two repos
@@ -71,7 +109,7 @@ for paths, directories, logical keys, ids and names. Everything else for produce
 [recommendation](spec/profile.md#producer-recommendations). Follow it and a consumer can index
 the crate's people, instrument and notebook entry for search; depart from it and the crate
 is still packaged. Compare against
-[`0.2/example1/ro-crate-metadata.json`](0.2/example1/ro-crate-metadata.json), which follows
+[`0.3/example1/ro-crate-metadata.json`](0.3/example1/ro-crate-metadata.json), which follows
 every recommendation.
 
 **If you consume crates**, the consumer requirements are normative too. A conforming
@@ -90,7 +128,8 @@ silently dropped.
 ```sh
 python3 -m venv .venv && .venv/bin/pip install pyld requests markdown
 
-./build.sh 0.2                  # regenerate index.html and the .jsonld alias
+# Regenerate the HTML specification, JSON-LD alias and root version index
+PATH="$PWD/.venv/bin:$PATH" ./build.sh 0.3
 .venv/bin/python validate.py    # structural checks (pass a version to check another)
 ```
 
@@ -102,7 +141,7 @@ python3 -m venv .venv && .venv/bin/pip install pyld requests markdown
 `ROCRATE_CONTEXT` to a local file to run offline. It checks JSON-LD expansion with no term
 dropped, the Profile Crate's structural requirements, resource descriptors and their roles,
 term definitions agreeing with the term set in both directions, the base specification's
-required root properties on the example, and the `.jsonld` alias being present and current.
+required root properties on each example, and the `.jsonld` alias being present and current.
 
 It does **not** check arbitrary crates against the profile; no SHACL shape exists yet.
 [`roc-validator`](https://github.com/crs4/rocrate-validator) covers the base specification
@@ -122,12 +161,16 @@ Current state:
 - [x] GitHub Pages enabled, serving at <https://quiltdata.github.io/quilt-ro-crate-profile/>
 - [x] `https://w3id.org/quilt/ro-crate` registered ([perma-id/w3id.org#6749](https://github.com/perma-id/w3id.org/pull/6749), merged)
 - [x] `https://w3id.org/quilt/ro-crate/0.2` resolving (versioned rules route any `MAJOR.MINOR`)
-- [ ] Unversioned URI moved from 0.1 to 0.2: submitted as
-  [perma-id/w3id.org#6751](https://github.com/perma-id/w3id.org/pull/6751), awaiting merge.
-  `w3id/` matches that submission.
+- [x] Unversioned URI moved to 0.2: [perma-id/w3id.org#6751](https://github.com/perma-id/w3id.org/pull/6751)
+  merged September 25, 2026. `w3id/` matches the merged rules, synchronized in
+  [#2](https://github.com/quiltdata/quilt-ro-crate-profile/pull/2).
+- [ ] Publish 0.3 by merging the release PR and verifying Pages serves `/0.3/` and its JSON/JSON-LD artifacts.
+- [ ] Repoint the unversioned URI from 0.2 to 0.3 after Pages publishes it, via a new
+  w3id pull request. Update `w3id/` with that submission.
 - [ ] Listed in the [RO-Crate profiles registry](https://profiles.ro-crate.org/): 0.1 and 0.2
   submitted as
   [eScienceLab/RO-Crate-Profile-Portal#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting review
+- [ ] Add the 0.3 versioned URI to the profiles registry after publishing.
 - [ ] SHACL shape added under the `validation` role
 - [x] Maintainer contact filled in, in [`w3id/README.md`](w3id/README.md) and the `.htaccess`
 
