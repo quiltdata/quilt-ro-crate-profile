@@ -135,6 +135,24 @@ term IRIs resolve but land nowhere useful.
 4. Add the new versioned URI to the RO-Crate profiles registry; earlier versions stay
    listed.
 
+### Version 0.3 publishing status (2026-10-23)
+
+- Release [quiltdata/quilt-ro-crate-profile#5](https://github.com/quiltdata/quilt-ro-crate-profile/pull/5)
+  is merged. Live 0.3 HTML, JSON and JSON-LD artifacts return 200, have the expected media
+  types and match the committed release bytes. The versioned w3id URI already resolves.
+- [perma-id/w3id.org#6964](https://github.com/perma-id/w3id.org/pull/6964) proposes moving
+  the unversioned URI from 0.2 to 0.3. `w3id/` matches this submission. Tested with Apache
+  2.4.67: all 13 redirect/content-negotiation cases passed, including older versioned URIs.
+  Until upstream merges it, the live unversioned URI continues to serve 0.2.
+- The registry's 0.1/0.2 submission
+  [#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61) merged October 21.
+  Version 0.3 is submitted separately as
+  [#67](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/67), retaining older
+  entries. Its live URI passes the registry's content-type and RDF `prof:Profile` checks.
+
+The upstream submissions await maintainer review. After they merge, verify the unversioned
+URI with both HTML and JSON-LD Accept headers and confirm 0.3 appears in the registry.
+
 ## Sequence
 
 1. ~~Enable GitHub Pages and confirm the served URL.~~ **Done** — serving from `main` at the
@@ -168,9 +186,9 @@ term IRIs resolve but land nowhere useful.
    [eScienceLab/RO-Crate-Profile-Portal](https://github.com/eScienceLab/RO-Crate-Profile-Portal);
    its check runs `upload_profiles.py --dry-run`, which fetches the URI with
    `Accept: application/ld+json` and requires a `prof:Profile` entity. The versioned w3id URI
-   `https://w3id.org/quilt/ro-crate/0.1` passes locally. **Submitted** as
-   [#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), awaiting maintainer
-   review; the check needs a maintainer to approve it because the pull request comes from a fork.
+   `https://w3id.org/quilt/ro-crate/0.1` passed locally. **Merged** as
+   [#61](https://github.com/eScienceLab/RO-Crate-Profile-Portal/pull/61), including 0.1 and 0.2.
+   See the 0.3 status above for the subsequent version submission.
 
 Elapsed time for step 4: the pull request was opened and merged the same day.
 
