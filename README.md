@@ -34,7 +34,18 @@ packaging system can read the crate directly instead of requiring a separate man
   An absolute S3 root `@id` ending in `/` supplies the base for relative `hasPart` IDs,
   so metadata can live outside a read-only data bucket. Relative paths remain package
   logical keys, and the existing containment and collision rules still apply. See the
-  [detached example](0.3/example2/ro-crate-metadata.json).
+  [detached example](0.3/example2/ro-crate-metadata.json), which also demonstrates a
+  contextual parent link and an upstream MD5 checksum without adding JSON-LD keys.
+
+Producers should declare the versioned `https://w3id.org/quilt/ro-crate/0.3` in root
+`conformsTo`. The unversioned URI still points to 0.2. The spec includes explicit examples
+of collisions between relative and absolute members.
+
+**External validator compatibility:** `roc-validator` 0.13.0 accepts the S3 root but
+rejects relative member IDs in detached mode, including with `--metadata-only`. The
+committed detached example therefore fails its REQUIRED detached-member check. See
+[tested results and reproduction commands](docs/validator-compatibility.md), including
+an absolute-ID comparison that passes and its effect on package logical keys.
 
 These are profile changes. Packaging Engine support for the new fields and S3 base rule
 must be implemented separately; publishing this specification does not update consumers.

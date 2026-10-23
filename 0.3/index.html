@@ -145,6 +145,11 @@ Relative members retain their relative paths as package logical keys; selecting 
 base does not turn them into basename-only keys. Absolute S3 members keep the existing
 basename rule. All other root identifiers leave the metadata-folder base unchanged.
 <code>isPartOf</code> does not select a base.</p>
+<p>A relative member <code>A1.fcs</code> and an absolute member <code>s3://other-bucket/run/A1.fcs</code>
+both map to logical key <code>A1.fcs</code>. If they name different objects, the consumer MUST reject
+the crate. By contrast, relative <code>wells/A1.fcs</code> maps to <code>wells/A1.fcs</code> and does not collide
+with that absolute member's <code>A1.fcs</code>. The same rule applies to collisions discovered
+while expanding directories.</p>
 <p>For example, a metadata document stored at
 <code>s3://manifests/crates/assay/ro-crate-metadata.json</code> can describe data in a read-only bucket:</p>
 <pre><code class="language-json">{
@@ -215,12 +220,36 @@ requires <code>name</code>, <code>description</code>, <code>datePublished</code>
 profile adds nothing to those requirements and does not enforce them. In addition, the root
 data entity:</p>
 <ul>
-<li>SHOULD declare <code>conformsTo</code> including <code>{"@id": "https://w3id.org/quilt/ro-crate"}</code>, with a
+<li>SHOULD declare <code>conformsTo</code> including <code>{"@id": "https://w3id.org/quilt/ro-crate/0.3"}</code>, with a
   corresponding contextual entity typed <code>["CreativeWork", "Profile"]</code>. This tells readers and
-  tools which conventions the crate follows; it does not change how a consumer processes it.</li>
+  tools which conventions the crate follows; it does not change how a consumer processes it.
+  Use the versioned URI to identify the exact rules, especially while the unversioned URI
+  still resolves to 0.2. The unversioned URI MAY be declared in addition.</li>
 <li>SHOULD declare <code>creator</code>, <code>producer</code>, <code>mentions</code> and <code>subjectOf</code>, which are what a consumer
   reads for search metadata, as described below. <code>keywords</code> is also RECOMMENDED.</li>
 </ul>
+<h3 id="parent-datasets">Parent datasets</h3>
+<p>A leaf crate SHOULD link to its containing collection using root <code>isPartOf</code>. To describe
+the parent as context without including its contents in the manifest, use a fragment
+identifier for a contextual <code>CreativeWork</code> and put the parent's location in <code>url</code>:</p>
+<pre><code class="language-json">{
+  &quot;@id&quot;: &quot;#parent-dataset&quot;,
+  &quot;@type&quot;: &quot;CreativeWork&quot;,
+  &quot;name&quot;: &quot;Acquisition collection&quot;,
+  &quot;url&quot;: &quot;s3://source-data/acquisitions/&quot;
+}
+</code></pre>
+<p>The root references it with <code>"isPartOf": { "@id": "#parent-dataset" }</code>. The fragment
+identifies the description of the parent collection; <code>url</code> records its external location.
+Using <code>CreativeWork</code> describes the collection as context without asserting that its
+contents are payload Data Entities. An absolute-URI <code>Dataset</code> is a Data Entity and must
+be reachable through <code>hasPart</code>. RO-Crate's
+<a href="https://www.researchobject.org/ro-crate/specification/1.2/data-entities.html">Data Entity rules</a>
+also allow fragment-identified contextual <code>Dataset</code>s, but <code>roc-validator</code> 0.13.0 still
+reports root-linkage failures for that form. Use the <code>CreativeWork</code> pattern for compatibility.
+Do not add the parent to <code>hasPart</code> merely to satisfy that check: under this profile it
+would request packaging the parent's contents. Neither <code>isPartOf</code> nor the parent's <code>url</code>
+changes the packaging base. See the <a href="../0.3/example2/ro-crate-metadata.json">detached example</a>.</p>
 <h3 id="file-entities">File entities</h3>
 <p>Each <code>File</code> SHOULD carry <code>name</code>, <code>encodingFormat</code>, <code>contentSize</code>, <code>dateCreated</code>,
 <code>dateModified</code> and <code>sha256</code>. A consumer attaches every property except <code>@id</code>, <code>@type</code> and
@@ -229,6 +258,25 @@ data entity:</p>
 the times the files were transferred or copied. Object stores overwrite filesystem
 timestamps on upload, so these properties are frequently the only surviving record of when
 an experiment actually ran. The two are often equal; that is expected and correct.</p>
+<h4 id="upstream-checksums">Upstream checksums</h4>
+<p>When a source supplies a checksum other than SHA-256, producers SHOULD retain its algorithm
+and value rather than put it in <code>sha256</code>. For example, a file can reference a <code>PropertyValue</code>
+under <code>identifier</code>:</p>
+<pre><code class="language-json">{
+  &quot;@id&quot;: &quot;#A1-md5&quot;,
+  &quot;@type&quot;: &quot;PropertyValue&quot;,
+  &quot;propertyID&quot;: &quot;https://example.org/terms#md5&quot;,
+  &quot;name&quot;: &quot;Upstream MD5 checksum&quot;,
+  &quot;value&quot;: &quot;d41d8cd98f00b204e9800998ecf8427e&quot;
+}
+</code></pre>
+<p>The file references it with <code>"identifier": { "@id": "#A1-md5" }</code>. The example digest is
+illustrative; use the source's actual value and an algorithm identifier under a documented
+namespace the producer controls in place of <code>https://example.org/terms#md5</code>. This uses
+stock JSON-LD keys and introduces no profile term. The consumer preserves the file's
+<code>identifier</code> as entry metadata and the referenced checksum entity in the packaged graph.
+An upstream checksum does not assert that the consumer verified it. A consumer MAY compute
+SHA-256 separately; it MUST NOT label an MD5, ETag or other checksum as <code>sha256</code>.</p>
 <h3 id="people-and-organizations">People and organizations</h3>
 <p>A consumer reads the <code>name</code> of each root <code>creator</code> and <code>producer</code>, following
 <code>parentOrganization</code> from each producer.</p>
@@ -480,7 +528,13 @@ agreeing with the term set in both directions, and each example declaring confor
 the profile.</p>
 <p>It does not check arbitrary crates against the requirements above; no SHACL shape exists
 yet. <a href="https://github.com/crs4/rocrate-validator"><code>roc-validator</code></a> covers the base
-specification layer.</p>
+specification layer. With version 0.13.0, the 1.2 profile in metadata-only, detached mode
+accepts the S3 root in example2 but reports REQUIRED failures for its relative file and
+directory IDs. It does not apply this profile's S3-root packaging resolution rule.
+Example2 therefore does <strong>not</strong> pass that external validator unchanged. See
+<a href="../docs/validator-compatibility.md">validator compatibility</a> for the tested command,
+results and the absolute-ID alternative. The local structural checks do not establish
+external-validator compatibility or implement S3 packaging.</p>
 <h2 id="references">References</h2>
 <ul>
 <li><a href="https://www.researchobject.org/ro-crate/specification/1.3/">RO-Crate 1.3 specification</a></li>

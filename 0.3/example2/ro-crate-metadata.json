@@ -32,7 +32,10 @@
         {
           "@id": "images/"
         }
-      ]
+      ],
+      "isPartOf": {
+        "@id": "#parent-dataset"
+      }
     },
     {
       "@id": "https://w3id.org/quilt/ro-crate/0.3",
@@ -47,7 +50,10 @@
       "@id": "wells/A1.fcs",
       "@type": "File",
       "name": "A1.fcs",
-      "encodingFormat": "application/vnd.isac.fcs"
+      "encodingFormat": "application/vnd.isac.fcs",
+      "identifier": {
+        "@id": "#A1-md5"
+      }
     },
     {
       "@id": "images/",
@@ -58,6 +64,19 @@
       "@id": "https://creativecommons.org/publicdomain/zero/1.0/",
       "@type": "CreativeWork",
       "name": "CC0 1.0 Universal"
+    },
+    {
+      "@id": "#parent-dataset",
+      "@type": "CreativeWork",
+      "name": "Acquisition collection",
+      "url": "s3://source-data/acquisitions/"
+    },
+    {
+      "@id": "#A1-md5",
+      "@type": "PropertyValue",
+      "propertyID": "https://example.org/terms#md5",
+      "name": "Upstream MD5 checksum (illustrative)",
+      "value": "d41d8cd98f00b204e9800998ecf8427e"
     }
   ]
 }
